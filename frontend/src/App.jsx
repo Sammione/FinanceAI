@@ -193,6 +193,19 @@ const SegmentComparativePanel = ({ segments, insights }) => (
 const ResultsDashboard = ({ results, onReset, chartData, runwayMonths }) => {
   const [currencyMode, setCurrencyMode] = useState('reported'); // 'reported' or 'base'
   
+  if (results?.analysisSuccessful === false) {
+     return (
+        <div className="adaptive-results-master" style={{padding: '120px 40px', textAlign: 'center'}}>
+           <div style={{maxWidth: '600px', margin: '0 auto', background: 'rgba(239, 68, 68, 0.05)', padding: '60px', borderRadius: '40px', border: '1px solid var(--danger)'}}>
+              <AlertCircle size={64} color="var(--danger)" style={{marginBottom: '20px'}}/>
+              <h2 style={{fontSize: '2.5rem', fontWeight: 900, letterSpacing: '-2px'}}>No Financial Data Detected</h2>
+              <p style={{color: 'var(--text-secondary)', fontSize: '1.1rem', marginTop: '15px'}}>The uploaded document (<b>{results?.reportingMetadata?.sourceDocument}</b>) does not appear to contain institutional-level financial metrics (Revenue, EBITDA, or Balance Sheet items). <br/><br/> Our precision-focussed engine has bypassed analysis to prevent data hallucination.</p>
+              <button className="btn-primary" onClick={onReset} style={{marginTop: '40px', marginInline: 'auto'}}>Try Another Document <Zap size={18}/></button>
+           </div>
+        </div>
+     );
+  }
+
   return (
     <div className="adaptive-results-master" style={{padding: '40px'}}>
        <div className="expert-header" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '40px', paddingLeft: '25px', borderLeft: '6px solid var(--accent-primary)'}}>

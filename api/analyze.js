@@ -49,127 +49,44 @@ app.post('/api/analyze', upload.single('document'), async (req, res) => {
             : extractedText;
 
         const response = await openai.chat.completions.create({
-            model: "gpt-4o", // Safe robust option with full chat and JSON support
+            model: "gpt-4o",
             messages: [
                 {
                     role: "system",
-                    content: `You are an expert financial analyst AI. Analyze the uploaded financial document and extract insights into a structured JSON format. 
+                    content: `You are a precision-focused financial analyst AI. Extract data from the provided text into a JSON format.
                     
-                    CRITICAL INSTRUCTION: You MUST extract or intelligently estimate "baselineFinancials" (as integers in USD) based on the context, size, and scale of the company (even if you have to guess realistic baseline numbers so our interactive stress-tester UI works).
+                    STRICT RULES:
+                    1. ONLY extract data explicitly present in the document.
+                    2. DO NOT hallucinate, guess, or estimate numbers if they are not found.
+                    3. If no significant numerical financial data (Revenue, Profit, EBITDA) is found, set "analysisSuccessful": false.
+                    4. Set "analysisSuccessful": true ONLY if valid numerical data is extracted.
                     
-                    Return ONLY a JSON object with this exact structure:
+                    Return ONLY a JSON object:
                     {
-                        "summary": "A brief overview of the document",
-                        "keyMetrics": [
-                            {"name": "Revenue", "value": "$0.00B"},
-                            {"name": "Net Income/Loss", "value": "$0.00M"},
-                            {"name": "EBITDA", "value": "$0.00M"},
-                            {"name": "Operating Margin", "value": "0.0%"},
-                            {"name": "Debt-to-Equity", "value": "0.00"}
-                        ],
-                        "risks": ["Risk 1", "Risk 2"],
-                        "opportunities": ["Opportunity 1", "Opportunity 2"],
-                        "sentiment": "Positive/Neutral/Negative",
+                        "analysisSuccessful": true/false,
+                        "summary": "Overview found in text (or 'No data found')",
+                        "reportingMetadata": {
+                            "originalCurrency": "Detected", "units": "Reported", "sourceDocument": "Title"
+                        },
+                        "keyMetrics": [{"name": "Metric", "value": "Found Value", "source": "Page X", "status": "Found Status"}],
+                        "deepSegments": [{"division": "Name", "revenue": "Value", "roic": "Value", "status": "Value", "source": "Value"}],
+                        "comparativeInsights": {"strongestUnit": "Name", "weakestUnit": "Name"},
                         "baselineFinancials": {
-                            "monthlyRevenue": 5000000, 
-                            "monthlyOperatingExpenses": 4000000,
-                            "currentCashReserves": 15000000,
-                            "totalDebt": 5000000
-                        },
-                        "marketBenchmark": "Above/Below Industry Average",
-                        "peerBenchmarking": [
-                            {"peerName": "Competitor 1", "revenue": "$20B", "margin": "12%", "status": "Underperforming"},
-                            {"peerName": "Competitor 2", "revenue": "$15B", "margin": "18%", "status": "Strong Rival"}
-                        ],
-                        "explainability": {
-                            "formulasUsed": ["ROE = Net Income / Equity", "EBITDA Margin = EBITDA / Revenue"],
-                            "reasoning": "Detailed logic for the numbers extracted"
-                        },
-                        "anomalyDetection": {
-                            "riskScore": 85,
-                            "findings": ["Inconsistent inventory turns vs revenue growth", "High debt-to-equity spike vs industry peer Danone"]
+                            "monthlyRevenue": 0, "monthlyOperatingExpenses": 0, "currentCashReserves": 0, "totalDebt": 0
                         },
                         "decisionIntelligence": {
-                            "overallScore": 72,
-                            "recommendations": [
-                                {"strategy": "Cost Optimization", "impact": "High", "confidence": 0.9},
-                                {"strategy": "Debt Refinancing", "impact": "Medium", "confidence": 0.85}
-                            ],
-                            "executiveSummaryDraft": "Targeted brief for the Board of Directors"
+                            "overallScore": 0, "recommendations": [{"strategy": "Found", "impact": "Found"}]
                         },
-                        "monteCarlo": {
-                            "bestCaseRevenueGrowth": 1.08,
-                            "worstCaseRevenueGrowth": 0.92,
-                            "volatilityIndex": 0.15
-                        },
-                        "segmentAnalysis": [
-                            {"unit": "Division Name", "revenue": "$100M", "profit": "$20M", "trend": "Growing/Stagnant", "opportunity": "Market entry"}
-                        ],
-                        "prescriptiveStrategy": [
-                            {
-                                "action": "Specific Step-by-Step Task",
-                                "implementation": ["Step 1...", "Step 2..."],
-                                "outcome": "EBITDA Improves by X.X% in Q2",
-                                "riskLevel": "Low/Med/High"
-                            }
-                        ],
-                        "decisionTree": {
-                            "root": "Main Strategic Goal",
-                            "nodes": [
-                                {"path": "Option A - Expansion", "outcome": "High Growth", "rads": 85},
-                                {"path": "Option B - Retention", "outcome": "Stability", "rads": 72}
-                            ]
-                        },
-                        "anomalyIntelligence": {
-                            "alerts": [
-                                {"type": "Fraud Risk/Cost Inflation", "severity": 9, "location": "Unit A", "correction": "Audit immediately"}
-                            ]
-                        },
-                        "waterfallData": [
-                            {"label": "Gross Revenue", "value": 10000000},
-                            {"label": "COGS", "value": -4000000},
-                            {"label": "OPEX", "value": -3000000},
-                            {"label": "Net Profit", "value": 3000000}
-                        ],
-                        "decisionTree": {
-                            "root": "Strategic Objective",
-                            "nodes": [
-                                {"path": "Option A", "outcome": "High Growth", "rads": 88},
-                                {"path": "Option B", "outcome": "Stability", "rads": 72}
-                            ]
-                        },
-                        "reportingMetadata": {
-                            "originalCurrency": "USD",
-                            "units": "Millions",
-                            "sourceDocument": "2024 10-K Filing",
-                            "fxRateToBase": 1.0
-                        },
-                        "deepSegments": [
-                            {"division": "Beverages", "revenue": "$4.5B", "roic": "14.2%", "status": "Strong", "source": "Segment Note 14"},
-                            {"division": "Nutrition", "revenue": "$3.1B", "roic": "15.8%", "status": "Stable", "source": "Segment Note 14"}
-                        ],
-                        "comparativeInsights": {
-                            "strongestUnit": "Health Science (19.5% ROIC)",
-                            "weakestUnit": "Emerging Markets (8.8% ROIC)",
-                            "groupAlpha": "+120bps"
-                        },
-                        "keyMetrics": [
-                            {"name": "Revenue", "value": "$10B", "source": "Page 12", "status": "Above Average"},
-                            {"name": "EBITDA", "value": "$2.1B", "source": "Page 12", "status": "Healthy"},
-                            {"name": "ROIC", "value": "16.4%", "source": "Internal Calculation", "status": "Strong"},
-                            {"name": "FCF", "value": "$800M", "source": "Page 45", "status": "Positive"}
-                        ],
-                        "advancedForecasting": {
-                            "lstmModelEstimate": "Stable Growth",
-                            "arimaTrend": "Rising Interest Rate Pressure",
-                            "confidenceInterval": "92%"
-                        },
-                        "conclusion": "Final thoughts"
+                        "anomalyIntelligence": {"alerts": []},
+                        "monteCarlo": {"bestCaseRevenueGrowth": 1.0, "worstCaseRevenueGrowth": 1.0, "volatilityIndex": 0.0},
+                        "waterfallData": [],
+                        "sentiment": "Neutural",
+                        "conclusion": "Conclusion"
                     }`
                 },
                 {
                     role: "user",
-                    content: `Here is the financial document text to analyze:\n\n${truncatedText}`
+                    content: `Analyze this institutional text: ${truncatedText}`
                 }
             ],
             response_format: { type: "json_object" }
