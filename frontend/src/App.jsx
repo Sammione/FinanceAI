@@ -125,7 +125,7 @@ const AnalyzerView = ({ loading, file, error, analyzeDocument, inputRef, handleF
            </div>
            <div className="drop-zone" onClick={() => inputRef.current.click()} style={{padding: '80px', border: '2px dashed var(--accent-primary)', borderRadius: '30px', background: 'rgba(14, 165, 233, 0.03)', transition: '0.4s', cursor: 'pointer', position: 'relative'}}>
               <Upload size={64} style={{color: 'var(--accent-primary)', marginBottom: '30px'}} />
-              <p style={{fontSize: '1.4rem', fontWeight: 900}}>{file ? file.name : "Drop Institutional Filing (PDF / TXT / CSV / EXCEL) Here"}</p>
+              <p style={{fontSize: '1.4rem', fontWeight: 900}}>{file ? file.name : "Drop Institutional Filing (PDF / TXT / CSV / EXCEL / XBRL) Here"}</p>
               <input ref={inputRef} style={{display: 'none'}} type="file" onChange={(e)=>handleFile(e.target.files[0])} />
            </div>
            <div className="ingestion-trust-grid" style={{display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '30px', marginTop: '60px', opacity: 0.6}}>
@@ -323,10 +323,15 @@ function App() {
         'text/plain', 
         'text/csv', 
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'application/vnd.ms-excel'
+        'application/vnd.ms-excel',
+        'application/xml',
+        'text/xml'
      ];
-     if (!allowedTypes.includes(f.type)) { 
-        setError('Supported: PDF, TXT, CSV, or EXCEL (XLSX/XLS)'); 
+     // Handle specific XBRL extensions or XML-based filings
+     const isXBRL = f.name.toLowerCase().endsWith('.xbrl') || f.name.toLowerCase().endsWith('.xml');
+     
+     if (!allowedTypes.includes(f.type) && !isXBRL) { 
+        setError('Supported: PDF, TXT, CSV, EXCEL, or XBRL (XML)'); 
         return; 
      } 
      setFile(f); 

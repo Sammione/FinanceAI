@@ -42,12 +42,14 @@ app.post('/api/analyze', upload.single('document'), async (req, res) => {
             
             // Tabular Data Handling with XLSX
             const workbook = xlsx.read(req.file.buffer, { type: 'buffer' });
-            // Extract text from the first sheet (default behavior for financial data)
             const sheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[sheetName];
             extractedText = xlsx.utils.sheet_to_csv(worksheet);
+        } else if (req.file.mimetype === 'application/xml' || req.file.mimetype === 'text/xml' || req.file.originalname.endsWith('.xbrl')) {
+            // XBRL / XML Parsing
+            extractedText = req.file.buffer.toString('utf-8');
         } else {
-            return res.status(400).json({ error: 'Unsupported file type. Please upload a PDF, TXT, CSV, or EXCEL file.' });
+            return res.status(400).json({ error: 'Unsupported file type. Please upload a PDF, TXT, CSV, EXCEL, or XBRL file.' });
         }
 
         if (!extractedText.trim()) {
