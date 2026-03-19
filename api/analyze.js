@@ -138,10 +138,27 @@ app.post('/api/analyze', upload.single('document'), async (req, res) => {
                                 {"path": "Option B", "outcome": "Stability", "rads": 72}
                             ]
                         },
+                        "deepSegments": [
+                            {"division": "Beverages", "revenue": "$4.5B", "ebitda": "18%", "roic": "14.2%", "risk": "Supply chain"},
+                            {"division": "Health Science", "revenue": "$2.8B", "ebitda": "22%", "roic": "19.5%", "risk": "R&D costs"},
+                            {"division": "Nutrition", "revenue": "$3.1B", "ebitda": "19%", "roic": "15.8%", "risk": "Pricing power"}
+                        ],
+                        "scenarioStudio": {
+                            "scenarios": [
+                                {"id": "S1", "name": "APAC Expansion", "roi": "18%", "runway": "4M", "rads": 88},
+                                {"id": "S2", "name": "Global Cost Cut", "roi": "5%", "runway": "24M", "rads": 72}
+                            ]
+                        },
+                        "keyMetrics": [
+                            {"name": "Revenue", "value": "$10B"},
+                            {"name": "EBITDA Margin", "value": "21%"},
+                            {"name": "ROIC", "value": "16.4%"},
+                            {"name": "Net Debt/EBITDA", "value": "1.8x"}
+                        ],
                         "advancedForecasting": {
                             "lstmModelEstimate": "Stable Growth",
                             "arimaTrend": "Rising Interest Rate Pressure",
-                            "probabilisticOutcomes": ["$10M (80% prob)", "$8M (15% prob)", "$12M (5% prob)"]
+                            "confidenceInterval": "92%"
                         },
                         "conclusion": "Final thoughts"
                     }`
