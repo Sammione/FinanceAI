@@ -117,10 +117,33 @@ const LandingView = ({ onAction }) => (
 const AnalyzerView = ({ loading, file, error, analyzeDocument, inputRef, handleFile }) => (
   <div className="analyzer-alpha" style={{padding: '120px 40px'}}>
      {loading ? (
-        <div className="upload-card" style={{maxWidth: '800px', padding: '120px 60px'}}>
-           <div className="loader"></div>
-           <h2 style={{fontSize: '2.5rem', fontWeight: 900, letterSpacing: '-2px'}}>Processing Neural Vectors</h2>
-           <p style={{color: 'var(--text-secondary)', marginTop: '10px', fontSize: '1.1rem'}}>Executing Bi-LSTM Modeling | Scaling Anomaly Detection | Exporting Alpha Bridge...</p>
+        <div className="upload-card" style={{maxWidth: '900px', padding: '100px 60px', textAlign: 'left', background: 'rgba(15, 23, 42, 0.6)'}}>
+           <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '30px'}}>
+              <div>
+                 <div style={{fontSize: '0.75rem', color: 'var(--accent-primary)', fontWeight: 900, letterSpacing: '2px', marginBottom: '10px'}}>QUANTITATIVE SYNTHESIS ACTIVE</div>
+                 <h2 style={{fontSize: '3.5rem', fontWeight: 900, letterSpacing: '-4px', lineHeight: 1}}>Synthesizing <br/>Strategic Alpha</h2>
+              </div>
+              <div style={{fontSize: '4rem', fontWeight: 900, color: 'var(--accent-primary)', opacity: 0.8}}>94%</div>
+           </div>
+           
+           <div className="modern-progress-bar" style={{height: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px', overflow: 'hidden', marginBottom: '40px', border: '1px solid var(--border)'}}>
+              <div style={{height: '100%', width: '94%', background: 'linear-gradient(90deg, var(--accent-primary), var(--accent-secondary))', boxShadow: '0 0 20px rgba(14, 165, 233, 0.5)', borderRadius: '6px'}}></div>
+           </div>
+
+           <div className="processing-subtasks" style={{display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px'}}>
+              <div style={{display:'flex', alignItems:'center', gap:'10px', fontSize:'0.85rem', color:'var(--text-secondary)'}}>
+                 <RefreshCw size={14} className="spin-slow" style={{color:'var(--accent-primary)'}}/> Parsing SEC/EDGAR Schema
+              </div>
+              <div style={{display:'flex', alignItems:'center', gap:'10px', fontSize:'0.85rem', color:'var(--text-secondary)'}}>
+                 <Cpu size={14} className="pulse-dot" style={{color:'var(--accent-primary)'}}/> Executing Bi-LSTM Forecasts
+              </div>
+              <div style={{display:'flex', alignItems:'center', gap:'10px', fontSize:'0.85rem', color:'var(--text-secondary)'}}>
+                 <GitBranch size={14} style={{color:'var(--accent-primary)'}}/> Mapping Monte Carlo Paths
+              </div>
+              <div style={{display:'flex', alignItems:'center', gap:'10px', fontSize:'0.85rem', color:'var(--text-secondary)'}}>
+                 <ShieldCheck size={14} style={{color:'var(--success)'}}/> Validating RADS Weighting
+              </div>
+           </div>
         </div>
      ) : (
         <div className="upload-card" style={{maxWidth: '1000px', margin: '0 auto', background: 'rgba(15, 23, 42, 0.4)', padding: '80px 60px', borderRadius: '40px', border: '1px solid rgba(14, 165, 233, 0.2)', backdropFilter: 'blur(40px)'}}>

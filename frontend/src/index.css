@@ -99,3 +99,10 @@ body { background-color: var(--bg-primary); color: var(--text-primary); min-heig
 .floating-kpi:nth-child(1) { animation: float 6s ease-in-out infinite; }
 .floating-kpi:nth-child(2) { animation: float 6s ease-in-out 1s infinite; }
 .floating-kpi:nth-child(3) { animation: float 6s ease-in-out 2s infinite; }
+
+/* Core Institutional Animations */
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.spin-slow { animation: spin 4s linear infinite; }
+
+@keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(14, 165, 233, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(14, 165, 233, 0); } }
+.pulse-dot { width: 8px; height: 8px; background: var(--accent-primary); border-radius: 50%; display: inline-block; animation: pulse 2s infinite; }
