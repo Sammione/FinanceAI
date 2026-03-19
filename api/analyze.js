@@ -77,6 +77,10 @@ app.post('/api/analyze', upload.single('document'), async (req, res) => {
                             "totalDebt": 5000000
                         },
                         "marketBenchmark": "Above/Below Industry Average",
+                        "peerBenchmarking": [
+                            {"peerName": "Competitor 1", "revenue": "$20B", "margin": "12%", "status": "Underperforming"},
+                            {"peerName": "Competitor 2", "revenue": "$15B", "margin": "18%", "status": "Strong Rival"}
+                        ],
                         "conclusion": "Final thoughts"
                     }`
                 },

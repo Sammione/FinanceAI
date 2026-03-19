@@ -108,6 +108,32 @@ const ResultsView = ({ results, onReset, interestRateShock, setInterestRateShock
          </div>
       </div>
 
+      {/* PEER BENCHMARKING GRID - NEW KILLER FEATURE */}
+      {results.peerBenchmarking && (
+        <div className="result-card full-width peer-matrix" style={{background: 'rgba(5, 10, 20, 0.4)', border: '1px solid rgba(255, 255, 255, 0.05)'}}>
+            <div style={{display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '25px'}}>
+              <BarChart3 style={{color: '#60a5fa'}} />
+              <h3 style={{fontSize: '1.4rem'}}>Global Peer Benchmarking Matrix</h3>
+            </div>
+            <div className="peer-table">
+               <div className="peer-row header">
+                  <span>Competitor</span>
+                  <span>Est. Revenue</span>
+                  <span>Op. Margin</span>
+                  <span>Market Positioning</span>
+               </div>
+               {results.peerBenchmarking.map((p, i) => (
+                 <div key={i} className="peer-row">
+                    <span style={{fontWeight: '700', color: 'white'}}>{p.peerName}</span>
+                    <span>{p.revenue}</span>
+                    <span>{p.margin}</span>
+                    <span className={`status-pill ${p.status?.toLowerCase().includes('strong') || p.status?.toLowerCase().includes('lead') ? 'good' : 'caution'}`}>{p.status}</span>
+                 </div>
+               ))}
+            </div>
+        </div>
+      )}
+
       <div className="result-card full-width predictor-card">
          <div className="predictor-header">
             <Activity className="predictor-icon" />

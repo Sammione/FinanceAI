@@ -413,3 +413,61 @@ body {
   .predictor-layout { grid-template-columns: 1fr; }
   .hero-title { font-size: 3rem; }
 }
+
+/* Peer Benchmarking Matrix */
+.peer-table {
+  width: 100%;
+}
+
+.peer-row {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1.2fr;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  align-items: center;
+}
+
+.peer-row.header {
+  border-bottom: 2px solid var(--border);
+  color: var(--text-primary);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+}
+
+.peer-row:last-child {
+  border-bottom: none;
+}
+
+.status-pill {
+  padding: 6px 14px;
+  border-radius: 30px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  width: fit-content;
+}
+
+.status-pill.good {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.status-pill.caution {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+@media (max-width: 800px) {
+  .peer-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+  .peer-row.header { display: none; }
+}
+
