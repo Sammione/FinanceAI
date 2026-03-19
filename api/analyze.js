@@ -102,6 +102,34 @@ app.post('/api/analyze', upload.single('document'), async (req, res) => {
                             "worstCaseRevenueGrowth": 0.92,
                             "volatilityIndex": 0.15
                         },
+                        "segmentAnalysis": [
+                            {"unit": "Division Name", "revenue": "$100M", "profit": "$20M", "trend": "Growing/Stagnant", "opportunity": "Market entry"}
+                        ],
+                        "prescriptiveStrategy": [
+                            {
+                                "action": "Specific Step-by-Step Task",
+                                "implementation": ["Step 1...", "Step 2..."],
+                                "outcome": "EBITDA Improves by X.X% in Q2",
+                                "riskLevel": "Low/Med/High"
+                            }
+                        ],
+                        "decisionTree": {
+                            "root": "Main Strategic Goal",
+                            "nodes": [
+                                {"path": "Option A - Expansion", "outcome": "High Growth", "rads": 85},
+                                {"path": "Option B - Retention", "outcome": "Stability", "rads": 72}
+                            ]
+                        },
+                        "anomalyIntelligence": {
+                            "alerts": [
+                                {"type": "Fraud Risk/Cost Inflation", "severity": 9, "location": "Unit A", "correction": "Audit immediately"}
+                            ]
+                        },
+                        "advancedForecasting": {
+                            "lstmModelEstimate": "Stable Growth",
+                            "arimaTrend": "Rising Interest Rate Pressure",
+                            "probabilisticOutcomes": ["$10M (80% prob)", "$8M (15% prob)", "$12M (5% prob)"]
+                        },
                         "conclusion": "Final thoughts"
                     }`
                 },
