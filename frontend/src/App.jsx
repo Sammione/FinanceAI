@@ -1,192 +1,223 @@
 import { useState, useRef, useMemo, useEffect } from 'react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
-import { Activity, BarChart3, TrendingUp, AlertTriangle, Briefcase, ChevronRight, FileText, Upload, RefreshCw, Layers, ShieldCheck, MessageSquare, Target, Zap, AlertCircle, Database, GitBranch, PieChart as PieIcon, LineChart as LineIcon, Info } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Activity, BarChart3, TrendingUp, AlertTriangle, Briefcase, ChevronRight, FileText, Upload, RefreshCw, Layers, ShieldCheck, MessageSquare, Target, Settings, Info, Zap, AlertCircle } from 'lucide-react';
 
-const Header = ({ onHome, onAnalyze }) => (
-  <nav className="enterprise-nav">
-    <div className="nav-logo" onClick={onHome}>
-      <div className="logo-badge">EXPERT CORE</div>
-      <span>FinanceAI <span style={{opacity:0.5, fontWeight:400}}>/ Terminal</span></span>
-    </div>
-    <div className="nav-actions">
-       <button onClick={onHome}>System Overview</button>
-       <button onClick={onAnalyze}>Quantitative Input</button>
-       <button className="demo-btn">Live Market Feed <div className="pulse-dot"></div></button>
-    </div>
-  </nav>
-);
+// ELITE TIER COMPONENTS
+const LandingView = ({ onLaunch, onExplore }) => (
+  <div className="landing-page">
+    <section className="hero">
+      <div className="hero-pill"><ShieldCheck size={14} style={{marginRight: '6px'}}/> Banking-Grade AI Architecture</div>
+      <h1 className="hero-title">Decision Intelligence <br/><span>For Strategic CFOs</span></h1>
+      <p className="hero-subtitle">The world's most advanced AI-CFO platform. From document processing to real-time Monte Carlo simulations and Fraud Detection—all in one unified command center.</p>
+      <div className="hero-cta">
+        <button onClick={onLaunch} className="btn-primary">Initialize AI CFO <ChevronRight size={18}/></button>
+        <button onClick={onExplore} className="btn-secondary">Explore Advanced Features ↓</button>
+      </div>
+    </section>
 
-const AnalysisLoader = () => (
-  <div className="enterprise-loader">
-     <div className="spinner-orbit">
-       <div className="dot"></div>
-     </div>
-     <h2 style={{fontSize: '1.5rem', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '10px'}}>Neural Engine Processing</h2>
-     <p style={{fontSize: '0.8rem', color: 'var(--text-dim)', letterSpacing: '0.05em', textTransform: 'uppercase'}}>Parsing 10-K Vectors • Calculating WACC • Running MC Sim v3.2</p>
+    <div className="features-grid" id="features">
+      <div className="feature-card" onClick={onLaunch}>
+        <div className="feature-icon"><Zap/></div>
+        <h3>Explainable AI (XAI)</h3>
+        <p>Transparency at the core. Inspect every formula (ROE, ROIC, EBITDA) used to derive our institutional-grade forecasts.</p>
+      </div>
+      <div className="feature-card" onClick={onLaunch}>
+        <div className="feature-icon"><Target/></div>
+        <h3>Decision Engine</h3>
+        <p>Go beyond summary. Get tactical risk-adjusted recommendations for cost reduction and debt refinancing.</p>
+      </div>
+      <div className="feature-card" onClick={onLaunch}>
+        <div className="feature-icon"><RefreshCw/></div>
+        <h3>Monte Carlo Risk</h3>
+        <p>Simulation engine running thousands of probabilistic scenarios (Best/Worst/Base) to map future volatility.</p>
+      </div>
+    </div>
   </div>
 );
 
-const ResultsDashboard = ({ results, onReset, interestRateShock, setInterestRateShock, costShock, setCostShock, demandShock, setDemandShock, chartData, runwayMonths }) => (
-  <div className="enterprise-dashboard">
-    <div className="dashboard-header">
-       <div className="h-left">
-          <span>AI-DRIVEN QUANTITATIVE ASSESSMENT / SESSION_{Math.floor(Math.random()*9000)+1000}</span>
-          <h2>{results?.sentiment} Strategic Posture</h2>
-       </div>
+const AnalyzerView = ({ loading, file, dragActive, error, handleDrag, handleDrop, handleChange, analyzeDocument, inputRef }) => (
+  <section className="app-section" id="analyzer-app">
+    <div className="app-container">
+      {loading ? (
+        <div className="upload-card central-loading">
+           <div className="loader"></div>
+           <h2 style={{textAlign: 'center', marginBottom: '10px'}}>Launching Decision Engine...</h2>
+           <p style={{textAlign: 'center', color: 'var(--text-secondary)'}}>Running Monte Carlo simulations, extracting the Financial Scorecard, and scanning for anomalies...</p>
+        </div>
+      ) : (
+        <div className="upload-card">
+           <div style={{textAlign: 'center', marginBottom: '40px'}}>
+              <h2 style={{fontSize: '2.5rem', marginBottom: '10px'}}>Strategic Upload</h2>
+              <p style={{color: 'var(--text-secondary)'}}>Upload institutional filings to initialize the AI-CFO reasoning engine.</p>
+           </div>
+           
+           <div 
+              className={`drop-zone ${dragActive ? "active" : ""}`}
+              onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}
+              onClick={() => inputRef.current.click()}
+            >
+              <div className="upload-icon"><Upload size={48}/></div>
+              {file ? <h3 style={{color: 'white'}}>{file.name}</h3> : <p>Drop 10-K, 10-Q or Private Filings</p>}
+              <input ref={inputRef} type="file" className="file-input" accept=".pdf,.txt" onChange={handleChange} />
+            </div>
+            
+            {error && <div className="error-box" style={{color: 'var(--danger)', textAlign: 'center', marginTop: '16px'}}><AlertCircle style={{display:'inline', marginRight:'8px'}} size={18}/>{error}</div>}
+            <button className="btn-primary" style={{width: '100%', marginTop: '30px', padding: '20px', justifyContent: 'center'}} onClick={analyzeDocument} disabled={!file || loading}>
+                 {file ? 'Run Quantitative Analysis' : 'Select SEC Filing'}
+            </button>
+        </div>
+      )}
     </div>
+  </section>
+);
 
-    <div className="dash-grid">
-      {/* COLUMN 1: RATIOS & RISK */}
-      <div className="dash-col-1">
-         <div className="result-card">
-            <h3><BarChart3 size={14}/> Core Ratios</h3>
-            <div className="scorecard-compact">
-               {results?.keyMetrics?.map((m, i) => (
-                 <div key={i} className="compact-metric">
-                    <div className="c-label">{m.name}</div>
-                    <div className="c-val">{m.value}</div>
-                 </div>
-               ))}
-               <div className="compact-metric" style={{border: '1px solid var(--accent-blue)'}}>
-                  <div className="c-label">Sentiment Score</div>
-                  <div className="c-val">{results?.decisionIntelligence?.overallScore}%</div>
-               </div>
-            </div>
+const ResultsView = ({ results, onReset, interestRateShock, setInterestRateShock, costShock, setCostShock, demandShock, setDemandShock, chartData, runwayMonths }) => (
+  <section className="results-page">
+    <div className="results-wrapper">
+      <div className="results-header">
+         <div>
+            <div className="breadcrumb">FinanceAI / Institutional Reporting / v3.4.1</div>
+            <h1 style={{marginTop: '10px'}}>Intelligence Command Center</h1>
          </div>
-
-         <div className="result-card">
-            <h3><AlertTriangle size={14}/> Anomaly Vector Scans</h3>
-            <div className="anomaly-list">
-               {results?.anomalyIntelligence?.alerts?.map((a, i) => (
-                 <div key={i} className={`alert-box severity-\${Math.min(4, Math.ceil(a.severity/2))}`}>
-                    <div className="alert-top">
-                       <span className="alert-type">{a.type}</span>
-                       <span className="alert-sev">Lv.{a.severity}</span>
-                    </div>
-                    <div className="alert-loc">{a.location}</div>
-                    <div className="alert-correction">{a.correction}</div>
-                 </div>
-               ))}
-            </div>
-         </div>
-
-         <div className="result-card cfo-chat-compact">
-            <div className="c-head"><MessageSquare size={14} /> Analyst Direct-GPT</div>
-            <div className="c-msgs">
-               <div className="m-sys">Ready for qualitative inquiry. Model stability is nominal. Recommendations optimized for {results?.sentiment?.toLowerCase()} posture.</div>
-            </div>
-            <div className="c-input"><input placeholder="Query debt logic..." /><button><Zap size={14}/></button></div>
+         <div style={{display: 'flex', gap: '12px'}}>
+            <button className="btn-secondary" style={{padding: '10px 20px'}} onClick={onReset}>New Case</button>
+            <button className="btn-primary" style={{padding: '10px 20px'}}><RefreshCw size={16}/> Live Updates</button>
          </div>
       </div>
 
-      {/* COLUMN 2: FORECAST & STRATEGY */}
-      <div className="dash-col-2">
-         <div className="result-card chart-card">
-            <div className="chart-header">
-               <div>
-                  <h3>Forward Probabilistic Runway (12M)</h3>
-                  <p style={{fontSize: '0.7rem', color: 'var(--text-dim)'}}>Basis: Monte Carlo Simulation vs LSTM Cyclicality Estimates</p>
-               </div>
-               <div className="runway-enterprise">
-                  <span>Projected Liquidity</span>
-                  <div className={runwayMonths.includes('>') ? 'success' : 'danger'}>{runwayMonths}</div>
-               </div>
+      <div className="dashboard-layout">
+        <div className="dashboard-sidebar">
+            <div className="sidebar-card">
+                <h3><Target size={18} style={{marginRight: '8px', color: 'var(--accent-primary)'}}/> Decision Intelligence</h3>
+                <div className="strategic-score">
+                    <div className="score-value">{results.decisionIntelligence?.overallScore || 0}</div>
+                    <div className="score-label">Risk-Adjusted Alpha Score</div>
+                </div>
+                <div className="recommendations-list">
+                    {results.decisionIntelligence?.recommendations?.map((r, i) => (
+                        <div key={i} className="rec-item">
+                            <span className={`rec-tag ${r.impact?.toLowerCase()}`}>{r.impact} IMPACT</span>
+                            <div style={{fontWeight: '700', fontSize: '0.9rem', marginTop: '4px'}}>{r.strategy}</div>
+                            <div style={{fontSize: '0.75rem', color: 'var(--text-secondary)'}}>Conf: {(r.confidence*100).toFixed(0)}%</div>
+                        </div>
+                    ))}
+                </div>
             </div>
-            <div className="chart-wrapper">
-               <ResponsiveContainer width="100%" height={320}>
-                  <AreaChart data={chartData}>
-                     <defs>
-                        <linearGradient id="bandColor" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="var(--accent-blue)" stopOpacity={0.2}/>
-                          <stop offset="95%" stopColor="var(--accent-blue)" stopOpacity={0}/>
-                        </linearGradient>
-                     </defs>
-                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.02)" vertical={false} />
-                     <XAxis dataKey="month" stroke="var(--text-dim)" fontSize={10} />
-                     <YAxis stroke="var(--text-dim)" fontSize={10} hide />
-                     <Tooltip 
-                        contentStyle={{backgroundColor: 'var(--bg-deep)', border: '1px solid var(--border-active)', borderRadius: '8px', fontSize: '11px'}} 
-                        itemStyle={{color: 'white'}}
-                     />
-                     <Area type="monotone" dataKey="bestCase" stroke="var(--accent-emerald)" fill="none" strokeDasharray="4 4" name="Optimum" />
-                     <Area type="monotone" dataKey="worstCase" stroke="var(--accent-rose)" fill="none" strokeDasharray="4 4" name="Bearish" />
-                     <Area type="monotone" dataKey="cashReserves" stroke="var(--accent-blue)" strokeWidth={3} fill="url(#bandColor)" name="Baseline" />
-                  </AreaChart>
-               </ResponsiveContainer>
-            </div>
-            <div className="sim-controls">
-               <div className="sim-field">
-                  <label>Refinance Shock</label>
-                  <input type="range" min="0" max="10" value={interestRateShock} onChange={(e)=>setInterestRateShock(parseFloat(e.target.value))} />
-                  <div style={{fontSize: '0.6rem', color: 'var(--accent-blue)', marginTop: '4px'}}>+{interestRateShock}%</div>
-               </div>
-               <div className="sim-field">
-                  <label>Operating Inflation</label>
-                  <input type="range" min="0" max="50" value={costShock} onChange={(e)=>setCostShock(parseFloat(e.target.value))} />
-                  <div style={{fontSize: '0.6rem', color: 'var(--accent-blue)', marginTop: '4px'}}>+{costShock}%</div>
-               </div>
-               <div className="sim-field">
-                  <label>Revenue Contraction</label>
-                  <input type="range" min="0" max="50" value={demandShock} onChange={(e)=>setDemandShock(parseFloat(e.target.value))} />
-                  <div style={{fontSize: '0.6rem', color: 'var(--accent-blue)', marginTop: '4px'}}>-{demandShock}%</div>
-               </div>
-            </div>
-         </div>
 
-         <div className="result-card">
-            <h3><Zap size={14}/> Prescriptive Performance Timeline</h3>
-            <div className="strategy-grid">
-               {results?.prescriptiveStrategy?.map((s, i) => (
-                 <div key={i} className="strategy-card">
-                    <span className="s-status" style={{color: s.riskLevel?.includes('Low') ? 'var(--accent-emerald)' : 'var(--accent-amber)'}}>{s.riskLevel} Risk Profile</span>
-                    <h4>{s.action}</h4>
-                    <div className="s-steps">
-                       {s.implementation?.map((st, idx) => <div key={idx} className="s-step">{st}</div>)}
+            <div className="sidebar-card anomaly-card">
+                <div style={{display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '15px'}}>
+                    <AlertTriangle color="var(--danger)" />
+                    <h3 style={{color: 'var(--text-primary)'}}>Anomaly Scan</h3>
+                </div>
+                <div className="findings">
+                    {results.anomalyDetection?.findings?.map((f, i) => (
+                        <div key={i} className="finding-item">{f}</div>
+                    ))}
+                </div>
+            </div>
+        </div>
+
+        <div className="dashboard-main">
+            <div className="result-card scorecard" style={{marginBottom: '20px'}}>
+                <div className="grid-4">
+                   {results.keyMetrics?.map((m, i) => (
+                    <div key={i} className="metric-box">
+                       <div className="metric-v">{m.value}</div>
+                       <div className="metric-n">{m.name} <Info size={12} className="info-trigger" title={results.explainability?.formulasUsed?.[i] || ""} /></div>
                     </div>
-                    <div className="s-outcome">Outcome Projection: <span>{s.outcome}</span></div>
-                 </div>
-               ))}
+                   ))}
+                   <div className="metric-box benchmark-box">
+                       <div className="metric-v">{results.sentiment}</div>
+                       <div className="metric-n">CFO Tone Analysis</div>
+                   </div>
+                </div>
             </div>
-         </div>
-      </div>
 
-      {/* COLUMN 3: POSITIONING & NARRATIVE */}
-      <div className="dash-col-3">
-         <div className="result-card">
-            <h3><GitBranch size={14}/> Decision Tree Vectors</h3>
-            <div className="tree-root" style={{fontSize: '0.7rem', fontWeight: 800, color: 'white', opacity: 0.6}}>OBJECTIVE: {results?.decisionTree?.root}</div>
-            <div className="tree-nodes">
-               {results?.decisionTree?.nodes?.map((node, i) => (
-                 <div key={i} className="tree-node">
-                    <div className="node-content">
-                       <div className="node-path">{node.path}</div>
-                       <div className="node-outcome">{node.outcome}</div>
-                       <div className="node-rads">RADS: {node.rads}%</div>
+            <div className="result-card predictor-card">
+                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px'}}>
+                    <div>
+                        <h2>Monte Carlo Cash Probability</h2>
+                        <p style={{color: 'var(--text-secondary)'}}>Adjust shock parameters to see probabilistic bands (Best/Base cases).</p>
                     </div>
-                 </div>
-               ))}
-            </div>
-         </div>
+                    <div className="runway-big">
+                        <span style={{fontSize: '0.8rem', color: 'var(--text-secondary)'}}>Projected Survival</span>
+                        <div style={{fontSize: '1.8rem', fontWeight: '900', color: runwayMonths.includes('>') ? 'var(--success)' : 'var(--danger)'}}>{runwayMonths}</div>
+                    </div>
+                </div>
 
-         <div className="result-card">
-            <h3><Info size={14}/> Quantitative Narrative</h3>
-            <p style={{fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: 1.6}}>{results?.summary}</p>
-            <div style={{marginTop: '20px', padding: '12px', background: 'rgba(56, 189, 248, 0.05)', borderRadius: '6px', borderLeft: '3px solid var(--accent-blue)', fontSize: '0.7rem', color: 'white'}}>
-               <strong>AI VERDICT:</strong> {results?.conclusion}
+                <div className="predictor-layout">
+                    <div className="p-controls">
+                        <div className="c-field">
+                            <label>Refinancing Spike (%)</label>
+                            <input type="range" min="0" max="10" value={interestRateShock} onChange={(e)=>setInterestRateShock(parseFloat(e.target.value))} />
+                        </div>
+                        <div className="c-field">
+                            <label>Cost Shock (%)</label>
+                            <input type="range" min="0" max="50" value={costShock} onChange={(e)=>setCostShock(parseFloat(e.target.value))} />
+                        </div>
+                        <div className="c-field">
+                            <label>Demand Impact (%)</label>
+                            <input type="range" min="0" max="50" value={demandShock} onChange={(e)=>setDemandShock(parseFloat(e.target.value))} />
+                        </div>
+                        <div className="xai-explanation">
+                            <h4>Explainable Logic</h4>
+                            {results.explainability?.formulasUsed?.map((f, i) => (
+                                <code key={i}>{f}</code>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="p-chart-area">
+                        <ResponsiveContainer width="100%" height={320}>
+                            <AreaChart data={chartData}>
+                                <defs>
+                                  <linearGradient id="probBand" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
+                                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                                  </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                                <XAxis dataKey="month" stroke="var(--text-secondary)" />
+                                <YAxis tickFormatter={(v)=>`$${(v/1000000).toFixed(0)}M`} stroke="var(--text-secondary)" />
+                                <Tooltip contentStyle={{backgroundColor: '#0f172a', border: '1px solid #334155'}} />
+                                <Area type="monotone" dataKey="cashReserves" stroke="var(--accent-primary)" strokeWidth={3} fill="url(#probBand)" name="Base Projection" />
+                                <Area type="monotone" dataKey="bestCase" stroke="#10b981" fill="none" strokeDasharray="5 5" name="Best Case" />
+                                <Area type="monotone" dataKey="worstCase" stroke="#ef4444" fill="none" strokeDasharray="5 5" name="Worst Case" />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
             </div>
-         </div>
 
-         <div className="result-card">
-            <h3><PieIcon size={14}/> Performance Segments</h3>
-            {results?.segmentAnalysis?.map((s, i) => (
-              <div key={i} className="segment-item">
-                 <div className="s-top"><span>{s.unit}</span> <span>{s.profit}</span></div>
-                 <div className="s-bar-bg"><div className="s-bar-fill" style={{width: '75%'}}></div></div>
-                 <div className="s-bottom">{s.trend} | Alpha: {s.opportunity}</div>
-              </div>
-            ))}
-         </div>
+            <div className="result-card peer-card" style={{marginTop: '20px'}}>
+                <h3 style={{marginBottom: '20px'}}>Global Industry Positioning</h3>
+                <div className="peer-grid">
+                    {results.peerBenchmarking?.map((p, i) => (
+                        <div key={i} className="peer-box">
+                            <span className="p-name">{p.peerName}</span>
+                            <span className="p-rev">{p.revenue} / {p.margin}</span>
+                            <span className="p-stat" style={{color: p.status?.includes('Strong') ? 'var(--success)' : 'var(--danger)'}}>{p.status}</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
       </div>
+    </div>
+  </section>
+);
+
+const CFOChat = ({ results }) => (
+  <div className="cfo-chat">
+    <div className="chat-header">
+       <MessageSquare size={16} /> AI CFO Advisor
+    </div>
+    <div className="chat-body">
+       <div className="chat-msg system">How can I assist you with your quantitative strategy today?</div>
+       <div className="chat-msg system">Based on the analysis, I recommend focusing on {results?.decisionIntelligence?.recommendations?.[0]?.strategy} due to its high impact score.</div>
+    </div>
+    <div className="chat-input-row">
+       <input placeholder="Ask about the debt logic..." />
+       <button><Zap size={14}/></button>
     </div>
   </div>
 );
@@ -194,25 +225,29 @@ const ResultsDashboard = ({ results, onReset, interestRateShock, setInterestRate
 function App() {
   const [currentPage, setCurrentPage] = useState('landing'); 
   const [file, setFile] = useState(null);
+  const [dragActive, setDragActive] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [results, setResults] = useState(null);
+  const [showChat, setShowChat] = useState(false);
   const inputRef = useRef(null);
 
   const [interestRateShock, setInterestRateShock] = useState(0);
   const [costShock, setCostShock] = useState(0);
   const [demandShock, setDemandShock] = useState(0);
 
-  const handleFile = (f) => { setError(''); if (!f) return; if (f.type !== 'application/pdf' && f.type !== 'text/plain') { setError('Supported: PDF/TXT'); setFile(null); return; } setFile(f); };
+  const handleDrag = (e) => { e.preventDefault(); if (e.type === "dragenter" || e.type === "dragover") setDragActive(true); else setDragActive(false); };
+  const handleDrop = (e) => { e.preventDefault(); setDragActive(false); if (e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); };
+  const handleFile = (f) => { setError(''); if (f.type !== 'application/pdf' && f.type !== 'text/plain') { setError('Supported: PDF/TXT'); setFile(null); return; } setFile(f); };
 
   const analyzeDocument = async () => {
     if (!file) return; setLoading(true); setError('');
     const fd = new FormData(); fd.append('document', file);
     try {
       const resp = await fetch('/api/analyze', { method: 'POST', body: fd });
-      const d = await resp.json();
-      if (!resp.ok) throw new Error(d.error || 'Check server status');
-      if (d.success && d.analysis) { setResults(d.analysis); setCurrentPage('results'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.error || 'Server Error');
+      if (data.success && data.analysis) { setResults(data.analysis); setCurrentPage('results'); setShowChat(true); window.scrollTo({ top: 0, behavior: 'smooth' }); }
     } catch (err) { setError(err.message); } finally { setLoading(false); }
   };
 
@@ -239,47 +274,52 @@ function App() {
   const runwayMonths = useMemo(() => {
     if(!chartData.length) return 0;
     const idx = chartData.findIndex(d => d.cashReserves <= 0);
-    return idx === -1 ? '>12M' : `${idx}M`;
+    return idx === -1 ? '>12 Months' : `${idx} Months`;
   }, [chartData]);
 
   return (
-    <div className="expert-wrapper">
-      <Header onHome={() => setCurrentPage('landing')} onAnalyze={() => setCurrentPage('analyzer')} />
-      <main className="main-content">
-        {currentPage === 'landing' && (
-          <div className="hero-modern">
-             <div className="hero-accent"></div>
-             <h1 className="hero-t">THE QUANTUM <br/><span>FINANCIAL TERMINAL</span></h1>
-             <p className="hero-p">Advanced Prescriptive Intelligence for Institutional Analysts. Real-time Monte Carlo Simulation, Neural Forecasting, and Anomaly Vector Scans — Unified at the Expert-Core Tier.</p>
-             <div className="hero-cta-enterprise">
-                <button onClick={() => setCurrentPage('analyzer')}>Initialize Neural Layer</button>
-             </div>
-          </div>
-        )}
+    <div className={`main-wrapper ${currentPage}`}>
+      <nav className="main-nav">
+        <div className="nav-logo" onClick={() => setCurrentPage('landing')}>
+          <div className="logo-icon"><TrendingUp size={20}/></div>
+          <span>FinanceAI CFO</span>
+        </div>
+        <div className="nav-links">
+           <button onClick={() => setCurrentPage('landing')}>Solutions</button>
+           <button onClick={() => setCurrentPage('analyzer')}>The Engine</button>
+           <button className="contact-btn" onClick={() => setCurrentPage('analyzer')}>Request Demo</button>
+        </div>
+      </nav>
+
+      <div className="content-area">
+        {currentPage === 'landing' && <LandingView onLaunch={() => setCurrentPage('analyzer')} onExplore={() => document.getElementById('features')?.scrollIntoView({behavior: 'smooth'})} />}
         {currentPage === 'analyzer' && (
-          <div className="analyzer-view" style={{padding: '100px 40px'}}>
-             {loading ? <AnalysisLoader /> : (
-                <div className="upload-container-enterprise" style={{border: '1px dashed var(--border-active)', borderRadius: '12px', padding: '100px', textAlign: 'center'}}>
-                   <Upload size={30} style={{color: 'var(--accent-blue)', marginBottom: '20px'}} />
-                   <h3 style={{fontSize: '1rem', fontWeight: 800, marginBottom: '10px'}}>{file ? file.name : "Awaiting Data Selection"}</h3>
-                   <input ref={inputRef} type="file" style={{display: 'none'}} onChange={(e)=>handleFile(e.target.files[0])} />
-                   {!file && <button onClick={() => inputRef.current.click()} style={{background: 'none', color: 'var(--accent-blue)', border: '1px solid var(--accent-blue)', padding: '10px 20px', borderRadius: '4px', cursor: 'pointer'}}>Select SEC Filing</button>}
-                   {file && <button onClick={analyzeDocument} style={{background: 'var(--accent-blue)', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '4px', cursor: 'pointer'}}>Analyze Vectors</button>}
-                   {error && <p style={{color: 'var(--accent-rose)', marginTop: '20px', fontSize: '0.8rem'}}>{error}</p>}
-                </div>
-             )}
-          </div>
+            <AnalyzerView 
+                loading={loading} file={file} dragActive={dragActive} error={error}
+                handleDrag={handleDrag} handleDrop={handleDrop} handleChange={(e)=>handleFile(e.target.files[0])}
+                analyzeDocument={analyzeDocument} inputRef={inputRef}
+            />
         )}
         {currentPage === 'results' && results && (
-          <ResultsDashboard 
-            results={results} onReset={() => setCurrentPage('analyzer')}
-            interestRateShock={interestRateShock} setInterestRateShock={setInterestRateShock}
-            costShock={costShock} setCostShock={setCostShock}
-            demandShock={demandShock} setDemandShock={setDemandShock}
-            chartData={chartData} runwayMonths={runwayMonths}
-          />
+            <ResultsView 
+                results={results} onReset={() => { setResults(null); setFile(null); setCurrentPage('analyzer'); }}
+                interestRateShock={interestRateShock} setInterestRateShock={setInterestRateShock}
+                costShock={costShock} setCostShock={setCostShock}
+                demandShock={demandShock} setDemandShock={setDemandShock}
+                chartData={chartData} runwayMonths={runwayMonths}
+            />
         )}
-      </main>
+      </div>
+
+      {showChat && results && <CFOChat results={results} />}
+
+      <footer className="main-footer">
+        <div className="footer-content">
+            <div className="footer-brand">FinanceAI CFO Platform</div>
+            <p>Advanced Quantitative Reasoning Engine for Enterprise Finance.</p>
+            <div className="footer-copy">© 2026 FinanceAI Technologies. Protected by Bank-Grade Encryption.</div>
+        </div>
+      </footer>
     </div>
   );
 }
