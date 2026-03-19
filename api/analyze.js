@@ -81,6 +81,27 @@ app.post('/api/analyze', upload.single('document'), async (req, res) => {
                             {"peerName": "Competitor 1", "revenue": "$20B", "margin": "12%", "status": "Underperforming"},
                             {"peerName": "Competitor 2", "revenue": "$15B", "margin": "18%", "status": "Strong Rival"}
                         ],
+                        "explainability": {
+                            "formulasUsed": ["ROE = Net Income / Equity", "EBITDA Margin = EBITDA / Revenue"],
+                            "reasoning": "Detailed logic for the numbers extracted"
+                        },
+                        "anomalyDetection": {
+                            "riskScore": 85,
+                            "findings": ["Inconsistent inventory turns vs revenue growth", "High debt-to-equity spike vs industry peer Danone"]
+                        },
+                        "decisionIntelligence": {
+                            "overallScore": 72,
+                            "recommendations": [
+                                {"strategy": "Cost Optimization", "impact": "High", "confidence": 0.9},
+                                {"strategy": "Debt Refinancing", "impact": "Medium", "confidence": 0.85}
+                            ],
+                            "executiveSummaryDraft": "Targeted brief for the Board of Directors"
+                        },
+                        "monteCarlo": {
+                            "bestCaseRevenueGrowth": 1.08,
+                            "worstCaseRevenueGrowth": 0.92,
+                            "volatilityIndex": 0.15
+                        },
                         "conclusion": "Final thoughts"
                     }`
                 },
