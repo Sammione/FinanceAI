@@ -1,6 +1,6 @@
 import { useState, useRef, useMemo, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
-import { Activity, BarChart3, TrendingUp, AlertTriangle, Briefcase, ChevronRight, FileText, Upload, RefreshCw, Layers, ShieldCheck, MessageSquare, Target, Zap, AlertCircle, Database, GitBranch, PieChart as PieIcon, Info, Download, Shield, Box, Globe, Cpu, MoreHorizontal, ArrowUpRight, TrendingDown } from 'lucide-react';
+import { Activity, BarChart3, TrendingUp, AlertTriangle, Briefcase, ChevronRight, FileText, Upload, RefreshCw, Layers, ShieldCheck, MessageSquare, Target, Zap, AlertCircle, Database, GitBranch, PieChart as PieIcon, Info, Download, Shield, Box, Globe, Cpu, MoreHorizontal, ArrowUpRight, TrendingDown, Lock } from 'lucide-react';
 
 /* --- HOMEPAGE COMPONENTS (v9.0) --- */
 
@@ -115,26 +115,45 @@ const LandingView = ({ onAction }) => (
 /* --- ANALYSIS & RESULTS COMPONENTS --- */
 
 const AnalyzerView = ({ loading, file, error, analyzeDocument, inputRef, handleFile }) => (
-  <div className="analyzer-alpha" style={{padding: '80px 40px'}}>
+  <div className="analyzer-alpha" style={{padding: '120px 40px'}}>
      {loading ? (
-        <div className="upload-card">
+        <div className="upload-card" style={{maxWidth: '800px', padding: '120px 60px'}}>
            <div className="loader"></div>
-           <h2 style={{fontSize: '2.5rem', fontWeight: 900}}>Generating Alpha-Core Core</h2>
-           <p style={{color: 'var(--text-secondary)', marginTop: '10px'}}>Executing Bi-LSTM Modeling | Scaling Anomaly Vectors | Exporting Board Briefing...</p>
+           <h2 style={{fontSize: '2.5rem', fontWeight: 900, letterSpacing: '-2px'}}>Processing Neural Vectors</h2>
+           <p style={{color: 'var(--text-secondary)', marginTop: '10px', fontSize: '1.1rem'}}>Executing Bi-LSTM Modeling | Scaling Anomaly Detection | Exporting Alpha Bridge...</p>
         </div>
      ) : (
-        <div className="upload-card">
-           <h2 style={{fontSize: '3rem', fontWeight: 900, marginBottom: '10px'}}>Intelligence Ingest</h2>
-           <p style={{color: 'var(--text-secondary)', marginBottom: '40px'}}>Initialize the neural layer by uploading a strategic institutional document.</p>
-           <div className="drop-zone" onClick={() => inputRef.current.click()}>
-              <Upload size={48} style={{color: 'var(--accent-primary)', marginBottom: '20px'}} />
-              <p style={{fontWeight: 800}}>{file ? file.name : "Select SEC Filing (PDF/TXT)"}</p>
+        <div className="upload-card" style={{maxWidth: '1000px', margin: '0 auto', background: 'rgba(15, 23, 42, 0.4)', padding: '80px 60px', borderRadius: '40px', border: '1px solid rgba(14, 165, 233, 0.2)', backdropFilter: 'blur(40px)'}}>
+           <div style={{marginBottom: '50px', textAlign: 'center'}}>
+              <h2 style={{fontSize: '3.5rem', fontWeight: 900, letterSpacing: '-4px'}}>Data Ingestion Hub</h2>
+              <p style={{color: 'var(--text-secondary)', fontSize: '1.2rem', maxWidth: '600px', margin: '15px auto 0'}}>Unlock institutional-grade alpha by uploading strategic financial filings for high-fidelity neural analysis.</p>
+           </div>
+
+           <div className="drop-zone" onClick={() => inputRef.current.click()} style={{padding: '80px', border: '2px dashed var(--accent-primary)', borderRadius: '30px', background: 'rgba(14, 165, 233, 0.03)', transition: '0.4s', cursor: 'pointer', position: 'relative'}}>
+              <div style={{position: 'absolute', top: '15px', right: '15px', display: 'flex', gap: '8px'}}>
+                 <div className="pulse-dot"></div> <span style={{fontSize: '0.6rem', fontWeight: 900, opacity: 0.5}}>ENCRYPTED_PORT_8443</span>
+              </div>
+              <Upload size={64} style={{color: 'var(--accent-primary)', marginBottom: '30px'}} />
+              <p style={{fontSize: '1.4rem', fontWeight: 900}}>{file ? file.name : "Drop Institutional Filing (PDF/TXT) Here"}</p>
               <input ref={inputRef} style={{display: 'none'}} type="file" onChange={(e)=>handleFile(e.target.files[0])} />
            </div>
-           {error && <p style={{color: 'var(--danger)', marginTop: '20px'}}>{error}</p>}
+
+           <div className="ingestion-trust-grid" style={{display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '30px', marginTop: '60px', opacity: 0.6}}>
+              <div style={{display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.75rem', fontWeight: 800}}>
+                 <ShieldCheck size={18} color="var(--success)"/> SEC / EDGAR COMPLIANT
+              </div>
+              <div style={{display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.75rem', fontWeight: 800}}>
+                 <Database size={18} color="var(--accent-primary)"/> BI-LSTM VECTOR READY
+              </div>
+              <div style={{display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.75rem', fontWeight: 800}}>
+                 <Lock size={18} color="var(--warning)"/> AES-256 BANK GRADE
+              </div>
+           </div>
+
+           {error && <p style={{color: 'var(--danger)', marginTop: '30px', textAlign: 'center', fontWeight: 700}}>{error}</p>}
            {file && (
-              <button className="btn-primary" style={{width: '100%', marginTop: '30px', justifyContent: 'center'}} onClick={analyzeDocument}>
-                 Run Institutional Neural Scans <RefreshCw size={18}/>
+              <button className="btn-primary" style={{width: '100%', marginTop: '50px', justifyContent: 'center', height: '80px', fontSize: '1.25rem'}} onClick={analyzeDocument}>
+                 Initialize High-Fidelity Scan <Zap size={24}/>
               </button>
            )}
         </div>
