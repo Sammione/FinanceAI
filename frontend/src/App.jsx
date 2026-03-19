@@ -52,7 +52,7 @@ const AnalyzerView = ({ loading, file, dragActive, error, handleDrag, handleDrop
            </div>
            
            <div 
-              className={`drop-zone \${dragActive ? "active" : ""}`}
+              className={`drop-zone ${dragActive ? "active" : ""}`}
               onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}
               onClick={() => inputRef.current.click()}
             >
@@ -90,7 +90,7 @@ const ResultsView = ({ results, onReset, interestRateShock, setInterestRateShock
                <ShieldCheck style={{color: '#10b981'}} />
                <h3>Institutional Scorecard</h3>
             </div>
-            <div className={`sentiment-badge \${results.sentiment?.toLowerCase().includes('positive') ? 'positive' : results.sentiment?.toLowerCase().includes('negative') ? 'negative' : 'neutral'}`}>
+            <div className={`sentiment-badge ${results.sentiment?.toLowerCase().includes('positive') ? 'positive' : results.sentiment?.toLowerCase().includes('negative') ? 'negative' : 'neutral'}`}>
               {results.sentiment}
             </div>
          </div>
@@ -151,7 +151,7 @@ const ResultsView = ({ results, onReset, interestRateShock, setInterestRateShock
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
                       <XAxis dataKey="month" stroke="#94a3b8" />
-                      <YAxis stroke="#94a3b8" tickFormatter={(v)=>\`\$\${(v/1000000).toFixed(0)}M\`} />
+                      <YAxis stroke="#94a3b8" tickFormatter={(v)=>`$${(v/1000000).toFixed(0)}M`} />
                       <Tooltip contentStyle={{backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#fff'}} />
                       <Area type="monotone" dataKey="cashReserves" stroke="#3b82f6" fillOpacity={1} fill="url(#colorCash)" strokeWidth={3} />
                   </AreaChart>
@@ -263,7 +263,7 @@ function App() {
         const netCashFlow = currentRev - currentExp - monthlyInterestExp;
         if (i > 0) currentCash += netCashFlow;
         months.push({
-            month: \`M\${i}\`,
+            month: `M${i}`,
             cashReserves: Math.floor(currentCash),
             revenue: Math.floor(currentRev)
         });
@@ -274,7 +274,7 @@ function App() {
   const runwayMonths = useMemo(() => {
     if(!chartData.length) return 0;
     const bankruptIndex = chartData.findIndex(d => d.cashReserves <= 0);
-    return bankruptIndex === -1 ? '>12 Months' : \`\${bankruptIndex} Months\`;
+    return bankruptIndex === -1 ? '>12 Months' : `${bankruptIndex} Months`;
   }, [chartData]);
 
   const onExplore = () => {
