@@ -1,0 +1,14 @@
+node_modules/
+.env
+dist/
+build/
+.vscode/
+.DS_Store
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.idea/
+.gemini/
+brain/
+implementation_walkthrough.md
