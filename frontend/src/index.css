@@ -34,6 +34,10 @@ body {
   flex-direction: column;
 }
 
+.content-area {
+  flex: 1;
+}
+
 .main-nav {
   display: flex;
   justify-content: space-between;
@@ -131,6 +135,7 @@ body {
 .hero-title span {
   background: linear-gradient(to right, #60a5fa, #a78bfa);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -374,6 +379,35 @@ body {
   border-radius: 14px;
   border: 1px solid rgba(59, 130, 246, 0.1);
 }
+
+.main-footer {
+  padding: 80px 40px;
+  background: #020617;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.footer-links {
+  margin-top: 16px;
+  font-size: 0.85rem;
+  opacity: 0.6;
+}
+
+.info-list {
+  list-style: none;
+}
+
+.info-list li {
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 10px;
+  margin-bottom: 10px;
+  border-left: 4px solid var(--accent-primary);
+}
+
+.info-list.risks li { border-left-color: var(--danger); }
+.info-list.opportunities li { border-left-color: var(--success); }
 
 @media (max-width: 1100px) {
   .predictor-layout { grid-template-columns: 1fr; }

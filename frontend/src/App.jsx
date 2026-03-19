@@ -115,17 +115,17 @@ function App() {
       </section>
 
       <div className="features-grid" id="features">
-        <div className="feature-card">
+        <div className="feature-card" onClick={() => setCurrentPage('analyzer')}>
           <div className="feature-icon"><Activity/></div>
           <h3>Static to Dynamic</h3>
           <p>We convert historical 10-Ks into living spreadsheets that react to your chosen market macro-environment.</p>
         </div>
-        <div className="feature-card">
+        <div className="feature-card" onClick={() => setCurrentPage('analyzer')}>
           <div className="feature-icon"><Layers/></div>
           <h3>Risk Forensics</h3>
-          <p>Unlocks hidden liabilities buried deep in legal footnotes using advanced NLP proprietary logic.</p>
+          <p>Unlocked hidden liabilities buried deep in legal footnotes using advanced NLP proprietary logic.</p>
         </div>
-        <div className="feature-card">
+        <div className="feature-card" onClick={() => setCurrentPage('analyzer')}>
           <div className="feature-icon"><Briefcase/></div>
           <h3>Institutional Quality</h3>
           <p>Designed for Hedge Funds, VC firms, and M&A analysts seeking immediate quantitative extraction.</p>
@@ -292,15 +292,17 @@ function App() {
           <span>FinanceAI</span>
         </div>
         <div className="nav-links">
-           <button onClick={() => setCurrentPage('landing')}>Solutions</button>
-           <button onClick={() => setCurrentPage('analyzer')}>The Machine</button>
-           <button className="contact-btn">Get Started</button>
+           <button onClick={() => { setCurrentPage('landing'); setTimeout(() => document.getElementById('features')?.scrollIntoView({behavior: 'smooth'}), 100); }}>Features</button>
+           <button onClick={() => setCurrentPage('analyzer')}>Analyze</button>
+           <button className="contact-btn" onClick={() => setCurrentPage('analyzer')}>Launch</button>
         </div>
       </nav>
 
-      {currentPage === 'landing' && <LandingView />}
-      {currentPage === 'analyzer' && <AnalyzerView />}
-      {currentPage === 'results' && <ResultsView />}
+      <div className="content-area">
+        {currentPage === 'landing' && <LandingView />}
+        {currentPage === 'analyzer' && <AnalyzerView />}
+        {currentPage === 'results' && <ResultsView />}
+      </div>
 
       <footer className="main-footer">
         <p>© 2026 FinanceAI Technologies. All rights reserved.</p>
