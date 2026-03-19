@@ -138,22 +138,26 @@ app.post('/api/analyze', upload.single('document'), async (req, res) => {
                                 {"path": "Option B", "outcome": "Stability", "rads": 72}
                             ]
                         },
+                        "reportingMetadata": {
+                            "originalCurrency": "USD",
+                            "units": "Millions",
+                            "sourceDocument": "2024 10-K Filing",
+                            "fxRateToBase": 1.0
+                        },
                         "deepSegments": [
-                            {"division": "Beverages", "revenue": "$4.5B", "ebitda": "18%", "roic": "14.2%", "risk": "Supply chain"},
-                            {"division": "Health Science", "revenue": "$2.8B", "ebitda": "22%", "roic": "19.5%", "risk": "R&D costs"},
-                            {"division": "Nutrition", "revenue": "$3.1B", "ebitda": "19%", "roic": "15.8%", "risk": "Pricing power"}
+                            {"division": "Beverages", "revenue": "$4.5B", "roic": "14.2%", "status": "Strong", "source": "Segment Note 14"},
+                            {"division": "Nutrition", "revenue": "$3.1B", "roic": "15.8%", "status": "Stable", "source": "Segment Note 14"}
                         ],
-                        "scenarioStudio": {
-                            "scenarios": [
-                                {"id": "S1", "name": "APAC Expansion", "roi": "18%", "runway": "4M", "rads": 88},
-                                {"id": "S2", "name": "Global Cost Cut", "roi": "5%", "runway": "24M", "rads": 72}
-                            ]
+                        "comparativeInsights": {
+                            "strongestUnit": "Health Science (19.5% ROIC)",
+                            "weakestUnit": "Emerging Markets (8.8% ROIC)",
+                            "groupAlpha": "+120bps"
                         },
                         "keyMetrics": [
-                            {"name": "Revenue", "value": "$10B"},
-                            {"name": "EBITDA Margin", "value": "21%"},
-                            {"name": "ROIC", "value": "16.4%"},
-                            {"name": "Net Debt/EBITDA", "value": "1.8x"}
+                            {"name": "Revenue", "value": "$10B", "source": "Page 12", "status": "Above Average"},
+                            {"name": "EBITDA", "value": "$2.1B", "source": "Page 12", "status": "Healthy"},
+                            {"name": "ROIC", "value": "16.4%", "source": "Internal Calculation", "status": "Strong"},
+                            {"name": "FCF", "value": "$800M", "source": "Page 45", "status": "Positive"}
                         ],
                         "advancedForecasting": {
                             "lstmModelEstimate": "Stable Growth",
