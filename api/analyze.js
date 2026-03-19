@@ -60,7 +60,13 @@ app.post('/api/analyze', upload.single('document'), async (req, res) => {
                     Return ONLY a JSON object with this exact structure:
                     {
                         "summary": "A brief overview of the document",
-                        "keyMetrics": [{"name": "Metric Name", "value": "Value"}],
+                        "keyMetrics": [
+                            {"name": "Revenue", "value": "$0.00B"},
+                            {"name": "Net Income/Loss", "value": "$0.00M"},
+                            {"name": "EBITDA", "value": "$0.00M"},
+                            {"name": "Operating Margin", "value": "0.0%"},
+                            {"name": "Debt-to-Equity", "value": "0.00"}
+                        ],
                         "risks": ["Risk 1", "Risk 2"],
                         "opportunities": ["Opportunity 1", "Opportunity 2"],
                         "sentiment": "Positive/Neutral/Negative",
@@ -70,6 +76,7 @@ app.post('/api/analyze', upload.single('document'), async (req, res) => {
                             "currentCashReserves": 15000000,
                             "totalDebt": 5000000
                         },
+                        "marketBenchmark": "Above/Below Industry Average",
                         "conclusion": "Final thoughts"
                     }`
                 },

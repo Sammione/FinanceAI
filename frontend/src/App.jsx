@@ -1,8 +1,9 @@
 import { useState, useRef, useMemo } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Activity } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import { Activity, BarChart3, TrendingUp, AlertTriangle, Briefcase, ChevronRight, FileText, Upload, RefreshCw, Layers, ShieldCheck } from 'lucide-react';
 
 function App() {
+  const [currentPage, setCurrentPage] = useState('landing'); // landing, analyzer, results
   const [file, setFile] = useState(null);
   const [dragActive, setDragActive] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -11,34 +12,20 @@ function App() {
   const inputRef = useRef(null);
 
   // Macro Stress Tester State
-  const [interestRateShock, setInterestRateShock] = useState(0); // Additive % point
-  const [costShock, setCostShock] = useState(0); // Multiplicative % increase in expenses
-  const [demandShock, setDemandShock] = useState(0); // Multiplicative % decrease in revenue
+  const [interestRateShock, setInterestRateShock] = useState(0);
+  const [costShock, setCostShock] = useState(0);
+  const [demandShock, setDemandShock] = useState(0);
 
   const handleDrag = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
+    e.preventDefault(); e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") setDragActive(true);
+    else if (e.type === "dragleave") setDragActive(false);
   };
 
   const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault(); e.stopPropagation();
     setDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFile(e.dataTransfer.files[0]);
-    }
-  };
-
-  const handleChange = (e) => {
-    e.preventDefault();
-    if (e.target.files && e.target.files[0]) {
-      handleFile(e.target.files[0]);
-    }
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
   };
 
   const handleFile = (selectedFile) => {
@@ -55,9 +42,8 @@ function App() {
     if (!file) return;
     setLoading(true);
     setError('');
-    setResults(null);
     
-    // Reset sliders
+    // Reset simulation
     setInterestRateShock(0);
     setCostShock(0);
     setDemandShock(0);
@@ -72,14 +58,12 @@ function App() {
       });
       const data = await response.json();
       
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to analyze document');
-      }
+      if (!response.ok) throw new Error(data.error || 'Failed to analyze document');
       
       if (data.success && data.analysis) {
         setResults(data.analysis);
-      } else {
-        throw new Error('Invalid response array from server');
+        setCurrentPage('results');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } catch (err) {
       setError(err.message);
@@ -88,46 +72,22 @@ function App() {
     }
   };
 
-  const scrollToApp = () => {
-    document.getElementById('analyzer-app')?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const getSentimentBadgeClass = (sentiment) => {
-    if (!sentiment) return 'neutral';
-    const s = sentiment.toLowerCase();
-    if (s.includes('positive') || s.includes('good') || s.includes('bullish')) return 'positive';
-    if (s.includes('negative') || s.includes('bad') || s.includes('bearish')) return 'negative';
-    return 'neutral';
-  };
-
-  // Predictive calculations for the UI using the extracted baselineFinancials
   const chartData = useMemo(() => {
     if (!results || !results.baselineFinancials) return [];
-    
     const base = results.baselineFinancials;
     const months = [];
-    
-    // Convert sliders to decimal impacts
     const revenueImpact = 1 - (demandShock / 100); 
     const expenseImpact = 1 + (costShock / 100);
-    
-    // Calculate new monthly burned cash with debt interest assumed 5% base + interest rate shock
     const annualInterestRate = Math.max(0, 0.05 + (interestRateShock / 100));
     const monthlyInterestExp = (base.totalDebt * annualInterestRate) / 12;
-    
     let currentCash = base.currentCashReserves;
-    
     for (let i = 0; i <= 12; i++) {
-        // Assume organic base growth naturally limits some disaster but applying shocks:
         const currentRev = base.monthlyRevenue * revenueImpact;
         const currentExp = base.monthlyOperatingExpenses * expenseImpact;
-        
         const netCashFlow = currentRev - currentExp - monthlyInterestExp;
-        
         if (i > 0) currentCash += netCashFlow;
-        
         months.push({
-            month: `Month ${i}`,
+            month: `M${i}`,
             cashReserves: Math.floor(currentCash),
             revenue: Math.floor(currentRev)
         });
@@ -135,245 +95,218 @@ function App() {
     return months;
   }, [results, interestRateShock, costShock, demandShock]);
 
-  // Derived predictive metric
   const runwayMonths = useMemo(() => {
     if(!chartData.length) return 0;
     const bankruptIndex = chartData.findIndex(d => d.cashReserves <= 0);
     return bankruptIndex === -1 ? '>12 Months' : `${bankruptIndex} Months`;
   }, [chartData]);
 
-
-  return (
-    <>
-      <nav className="navbar">
-        <div className="logo">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          FinanceAI Predictor
-        </div>
-        <div className="nav-links">
-          <a href="#features" className="nav-link">Features</a>
-          <a href="#analyzer-app" className="nav-link">App</a>
-        </div>
-        <button onClick={scrollToApp} className="nav-btn">Try For Free</button>
-      </nav>
-
+  // View Components
+  const LandingView = () => (
+    <div className="landing-page">
       <section className="hero">
-        <div className="hero-pill flex items-center gap-2"><Activity size={16}/> New: What-If Macro Tester</div>
-        <h1 className="hero-title">
-          Don't Just Read The Past. <br/><span>Predict The Future.</span>
-        </h1>
-        <p className="hero-subtitle">
-          FinanceAI not only extracts risk metrics, but generates a dynamic 12-month forward predictive model that stress-tests the company's survival against customizable macroeconomic shocks.
-        </p>
+        <div className="hero-pill"><ShieldCheck size={14} style={{marginRight: '6px'}}/> Institutional Grade Security</div>
+        <h1 className="hero-title">Predictive Intelligence <br/><span>For The Modern Financier</span></h1>
+        <p className="hero-subtitle">The world's first automated stress-testing platform. Upload any financial document and generate dynamic 12-month forward predictive models against market shocks.</p>
         <div className="hero-cta">
-          <button onClick={scrollToApp} className="btn-primary">Test A Document Now</button>
+          <button onClick={() => setCurrentPage('analyzer')} className="btn-primary">Launch Prediction Engine <ChevronRight size={18}/></button>
+          <button className="btn-secondary">Explore Scorecard</button>
         </div>
       </section>
 
-      {/* App Section / Analyzer */}
-      <section id="analyzer-app" className="app-section">
-        <div className="app-container">
-          
-          {!results && !loading && (
-            <div className="upload-card">
-              <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-                <h2 className="upload-title">Drop financial statement here</h2>
-                <p className="upload-subtitle">Upload 10-Qs, 10-Ks, or earning calls transcripts to build a forecast.</p>
-              </div>
+      <div className="features-grid" id="features">
+        <div className="feature-card">
+          <div className="feature-icon"><Activity/></div>
+          <h3>Static to Dynamic</h3>
+          <p>We convert historical 10-Ks into living spreadsheets that react to your chosen market macro-environment.</p>
+        </div>
+        <div className="feature-card">
+          <div className="feature-icon"><Layers/></div>
+          <h3>Risk Forensics</h3>
+          <p>Unlocks hidden liabilities buried deep in legal footnotes using advanced NLP proprietary logic.</p>
+        </div>
+        <div className="feature-card">
+          <div className="feature-icon"><Briefcase/></div>
+          <h3>Institutional Quality</h3>
+          <p>Designed for Hedge Funds, VC firms, and M&A analysts seeking immediate quantitative extraction.</p>
+        </div>
+      </div>
+    </div>
+  );
 
-              <div 
+  const AnalyzerView = () => (
+    <section className="app-section" id="analyzer-app">
+      <div className="app-container">
+        {loading ? (
+          <div className="upload-card central-loading">
+             <div className="loader"></div>
+             <h2>Constructing Predictive Model</h2>
+             <p>Our AI is deep-scanning the document to extract baseline cash-burn, debt structures, and revenue guidance...</p>
+          </div>
+        ) : (
+          <div className="upload-card">
+             <div style={{textAlign: 'center', marginBottom: '40px'}}>
+                <h2 style={{fontSize: '2.5rem', marginBottom: '10px'}}>Analyze & Forecast</h2>
+                <p style={{color: 'var(--text-secondary)'}}>Upload a PDF report or TXT filing to generate your real-time dashboard.</p>
+             </div>
+             
+             <div 
                 className={`drop-zone ${dragActive ? "active" : ""}`}
-                onDragEnter={handleDrag}
-                onDragLeave={handleDrag}
-                onDragOver={handleDrag}
-                onDrop={handleDrop}
+                onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}
                 onClick={() => inputRef.current.click()}
               >
-                <div className="upload-icon">📄</div>
-                {file ? (
-                  <h3 style={{color: 'var(--text-primary)'}}>{file.name}</h3>
-                ) : (
-                  <>
-                    <h3 style={{color: 'white', marginBottom: '8px'}}>Click to upload or drag and drop</h3>
-                    <p style={{color: 'var(--text-secondary)'}}>PDF or TXT</p>
-                  </>
-                )}
-                
-                <input 
-                  ref={inputRef}
-                  type="file" 
-                  className="file-input" 
-                  accept=".pdf,.txt"
-                  onChange={handleChange}
-                />
+                <div className="upload-icon"><Upload size={48}/></div>
+                {file ? <h3>{file.name}</h3> : <p>Drag & Drop Filing or Click to Browse</p>}
+                <input ref={inputRef} type="file" className="file-input" accept=".pdf,.txt" onChange={handleChange} />
               </div>
               
-              {error && <p style={{ color: 'var(--danger)', marginTop: '16px', textAlign: 'center' }}>{error}</p>}
-              
-              <button 
-                className="analyze-btn" 
-                onClick={analyzeDocument}
-                disabled={!file}
-              >
-                {file ? 'Generate Insights & Forecast Model' : 'Select a File First'}
+              {error && <div className="error-box">{error}</div>}
+              <button className="btn-primary" style={{width: '100%', marginTop: '30px', padding: '20px'}} onClick={analyzeDocument} disabled={!file}>
+                   {file ? 'Run Full Forecasting Analysis' : 'Awaiting Selection'}
               </button>
-            </div>
-          )}
+          </div>
+        )}
+      </div>
+    </section>
+  );
 
-          {loading && (
-            <div className="upload-card" style={{ padding: '80px 48px' }}>
-              <div className="loader-container">
-                <div className="loader"></div>
-                <h2 style={{ fontSize: '1.5rem', marginBottom: '8px' }}>Building Predictive Model...</h2>
-                <p style={{ color: 'var(--text-secondary)' }}>Extracting baseline cash burn, debt footprints, and mapping sentiment.</p>
+  const ResultsView = () => (
+    <section className="results-page">
+      <div className="results-wrapper">
+        <div className="results-header">
+           <div>
+              <h1>FinanceAI Intelligence Report</h1>
+              <p className="subtitle">Extracted on {new Date().toLocaleDateString()} from your filing</p>
+           </div>
+           <button className="reset-btn" onClick={() => { setResults(null); setFile(null); setCurrentPage('analyzer'); }}>
+             <RefreshCw size={16} style={{marginRight: '8px'}}/> New Analysis
+           </button>
+        </div>
+
+        {/* FINANCIAL SCORECARD - NEW FEATURE */}
+        <div className="result-card full-width scorecard">
+           <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px'}}>
+              <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
+                 <ShieldCheck className="text-success" />
+                 <h3>Institutional Scorecard</h3>
               </div>
-            </div>
-          )}
-
-          {results && (
-            <div className="results-container">
-              <div className="results-header">
-                <div>
-                  <h2 className="results-title">FinanceAI Intelligence Report</h2>
+              <div className={`sentiment-badge ${results.sentiment?.toLowerCase().includes('positive') ? 'positive' : results.sentiment?.toLowerCase().includes('negative') ? 'negative' : 'neutral'}`}>
+                {results.sentiment}
+              </div>
+           </div>
+           <div className="metrics-grid">
+              {results.keyMetrics?.map((m, i) => (
+                <div key={i} className="metric-item highlight">
+                   <div className="metric-value">{m.value}</div>
+                   <div className="metric-name">{m.name}</div>
                 </div>
-                <button className="reset-btn" onClick={() => { setResults(null); setFile(null); }}>
-                  Analyze New File
-                </button>
+              ))}
+              <div className="metric-item highlight benchmark">
+                 <div className="metric-value" style={{fontSize: '1.2rem'}}>{results.marketBenchmark || 'Targeting Sector Average'}</div>
+                 <div className="metric-name">Market Performance</div>
+              </div>
+           </div>
+        </div>
+
+        {/* STRESS TESTER */}
+        <div className="result-card full-width predictor-card">
+           <div className="predictor-header">
+              <Activity className="predictor-icon" />
+              <div>
+                <h2>Predictive Forward-Looking Simulator</h2>
+                <p>Stress-test company survival under macro shocks.</p>
+              </div>
+           </div>
+           
+           <div className="predictor-layout">
+              <div className="predictor-controls">
+                 <div className="control-group">
+                    <label>Interest Rate Refinancing Spike</label>
+                    <input type="range" min="0" max="10" step="0.5" value={interestRateShock} onChange={(e)=>setInterestRateShock(parseFloat(e.target.value))} />
+                    <div className="control-label"><span>0%</span> <span>+{interestRateShock}%</span> <span>10%</span></div>
+                 </div>
+                 <div className="control-group">
+                    <label>Operational Cost Inflation</label>
+                    <input type="range" min="0" max="50" step="1" value={costShock} onChange={(e)=>setCostShock(parseFloat(e.target.value))} />
+                    <div className="control-label"><span>0%</span> <span>+{costShock}%</span> <span>50%</span></div>
+                 </div>
+                 <div className="control-group">
+                    <label>Revenue / Demand Collapse</label>
+                    <input type="range" min="0" max="50" step="1" value={demandShock} onChange={(e)=>setDemandShock(parseFloat(e.target.value))} />
+                    <div className="control-label"><span>0%</span> <span>-{demandShock}%</span> <span>50%</span></div>
+                 </div>
+                 <div className="runway-stat">
+                    <span>Predicted Survival Runway</span>
+                    <h2 style={{color: runwayMonths.includes('>') ? 'var(--success)' : 'var(--danger)'}}>{runwayMonths}</h2>
+                 </div>
               </div>
               
-              <div className="results-grid" style={{ marginBottom: "40px" }}>
-                
-                {/* Sentiment */}
-                <div className="result-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-                  <h3 style={{ marginBottom: '16px', color: 'var(--text-secondary)' }}>Management Tone</h3>
-                  <div className={`sentiment-badge ${getSentimentBadgeClass(results.sentiment)}`}>
-                    {results.sentiment}
-                  </div>
-                </div>
-
-                {/* Exec Summary */}
-                <div className="result-card">
-                  <h3>Executive Summary</h3>
-                  <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>{results.summary}</p>
-                </div>
+              <div className="predictor-chart">
+                 <ResponsiveContainer width="100%" height={350}>
+                    <AreaChart data={chartData}>
+                        <defs>
+                          <linearGradient id="colorCash" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                        <XAxis dataKey="month" stroke="#94a3b8" />
+                        <YAxis stroke="#94a3b8" tickFormatter={(v)=>`$${(v/1000000).toFixed(0)}M`} />
+                        <Tooltip contentStyle={{backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px'}} />
+                        <Area type="monotone" dataKey="cashReserves" stroke="#3b82f6" fillOpacity={1} fill="url(#colorCash)" strokeWidth={3} />
+                    </AreaChart>
+                 </ResponsiveContainer>
               </div>
-
-              {/* STRESS TESTER UI */}
-              {results.baselineFinancials && (
-                <div className="result-card full-width" style={{ marginBottom: "40px", border: "1px solid rgba(139, 92, 246, 0.5)", background: "rgba(15, 23, 42, 0.8)", boxShadow: "0 10px 40px rgba(0,0,0,0.5)"}}>
-                    <div style={{display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px'}}>
-                        <Activity className="text-secondary" style={{color: 'var(--accent-secondary)'}} />
-                        <h2 style={{ color: 'white', fontSize: '1.75rem' }}>Interactive Macro-Shock Predictor</h2>
-                    </div>
-                    
-                    <p style={{ color: 'var(--text-secondary)', marginBottom: '32px' }}>
-                        Based on the document's extracted baseline financials (Monthly Rev: ${(results.baselineFinancials.monthlyRevenue/1000000).toFixed(1)}M, Cash: ${(results.baselineFinancials.currentCashReserves/1000000).toFixed(1)}M, Debt: ${(results.baselineFinancials.totalDebt/1000000).toFixed(1)}M). Adjust sliders below to stress-test the company's 12-month runway horizon!
-                    </p>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 350px) 1fr', gap: '40px' }}>
-                        
-                        {/* Interactive Sliders Form */}
-                        <div style={{ background: 'rgba(0,0,0,0.3)', padding: '24px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                            <div style={{ marginBottom: '24px' }}>
-                                <label style={{display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: 'var(--text-primary)', fontWeight: '600'}}>
-                                    <span>Interest Rate Shock</span>
-                                    <span style={{color: interestRateShock > 0 ? 'var(--danger)' : 'var(--text-secondary)'}}>+{interestRateShock}%</span>
-                                </label>
-                                <input 
-                                    type="range" min="0" max="10" step="0.5" 
-                                    value={interestRateShock} 
-                                    onChange={(e)=>setInterestRateShock(parseFloat(e.target.value))}
-                                    style={{width: '100%', accentColor: 'var(--accent-secondary)'}}
-                                />
-                                <span style={{fontSize: '0.8rem', color: 'var(--text-secondary)'}}>Simulate sudden debt refinancing spike</span>
-                            </div>
-
-                            <div style={{ marginBottom: '24px' }}>
-                                <label style={{display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: 'var(--text-primary)', fontWeight: '600'}}>
-                                    <span>Supply Chain Inflation (Cost Shock)</span>
-                                    <span style={{color: costShock > 0 ? 'var(--danger)' : 'var(--text-secondary)'}}>+{costShock}%</span>
-                                </label>
-                                <input 
-                                    type="range" min="0" max="50" step="1" 
-                                    value={costShock} 
-                                    onChange={(e)=>setCostShock(parseFloat(e.target.value))}
-                                    style={{width: '100%', accentColor: 'var(--accent-secondary)'}}
-                                />
-                            </div>
-
-                            <div style={{ marginBottom: '24px' }}>
-                                <label style={{display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: 'var(--text-primary)', fontWeight: '600'}}>
-                                    <span>Consumer Demand Crash</span>
-                                    <span style={{color: demandShock > 0 ? 'var(--danger)' : 'var(--text-secondary)'}}>-{demandShock}%</span>
-                                </label>
-                                <input 
-                                    type="range" min="0" max="50" step="1" 
-                                    value={demandShock} 
-                                    onChange={(e)=>setDemandShock(parseFloat(e.target.value))}
-                                    style={{width: '100%', accentColor: 'var(--accent-secondary)'}}
-                                />
-                            </div>
-
-                            <div style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.3)', padding: '16px', borderRadius: '12px', marginTop: '32px' }}>
-                                <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Predicted Survival Runway</div>
-                                <div style={{ fontSize: '2rem', fontWeight: '800', color: runwayMonths === '>12 Months' ? 'var(--success)' : 'var(--danger)'}}>
-                                    {runwayMonths}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Chart Result */}
-                        <div style={{ height: '400px' }}>
-                            <ResponsiveContainer width="100%" height="100%">
-                                <LineChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                                    <XAxis dataKey="month" stroke="rgba(255,255,255,0.5)" tick={{fill: 'rgba(255,255,255,0.5)'}} />
-                                    <YAxis tickFormatter={(val)=> "$" + (val/1000000).toFixed(0) + "M"} width={80} stroke="rgba(255,255,255,0.5)" tick={{fill: 'rgba(255,255,255,0.5)'}} />
-                                    <Tooltip 
-                                      contentStyle={{backgroundColor: 'rgba(15, 23, 42, 0.9)', borderColor: 'rgba(139, 92, 246, 0.4)', color: '#fff', borderRadius: '8px'}}
-                                      formatter={(val) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumSignificantDigits: 3 }).format(val)}
-                                    />
-                                    <Legend />
-                                    <Line type="monotone" name="Projected Cash Reserves" dataKey="cashReserves" stroke="var(--accent-secondary)" strokeWidth={3} dot={{r: 4, fill: "var(--accent-secondary)"}} activeDot={{ r: 8 }} />
-                                    <Line type="monotone" name="Monthly Revenue Track" dataKey="revenue" stroke="var(--accent-color)" strokeWidth={2} dot={false} />
-                                </LineChart>
-                            </ResponsiveContainer>
-                        </div>
-                    </div>
-                </div>
-              )}
-
-              <div className="results-grid">
-                
-                {/* Risks */}
-                <div className="result-card">
-                  <h3 style={{ color: 'var(--danger)' }}>Identified Qualitative Risks</h3>
-                  <ul className="data-list risks">
-                    {results.risks?.map((risk, index) => (
-                      <li key={index}>{risk}</li>
-                    ))}
-                  </ul>
-                </div>
-                
-                {/* Opportunities */}
-                <div className="result-card">
-                  <h3 style={{ color: 'var(--success)' }}>Strategic Opportunities</h3>
-                  <ul className="data-list opps">
-                    {results.opportunities?.map((opportunity, index) => (
-                      <li key={index}>{opportunity}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </div>
-          )}
+           </div>
         </div>
-      </section>
-    </>
+
+        <div className="results-bottom-grid">
+           <div className="result-card">
+              <h3 className="section-title"><AlertTriangle style={{color: 'var(--danger)'}}/> Identified Vulnerabilities</h3>
+              <ul className="info-list risks">
+                 {results.risks?.map((r,i)=><li key={i}>{r}</li>)}
+              </ul>
+           </div>
+           <div className="result-card">
+              <h3 className="section-title"><TrendingUp style={{color: 'var(--success)'}}/> Strategic Opportunities</h3>
+              <ul className="info-list opportunities">
+                 {results.opportunities?.map((o,i)=><li key={i}>{o}</li>)}
+              </ul>
+           </div>
+           <div className="result-card full-width conclusion">
+              <h3>Management Assessment</h3>
+              <p>{results.summary}</p>
+              <div className="final-verdict"><strong>AI PROJECTION:</strong> {results.conclusion}</div>
+           </div>
+        </div>
+      </div>
+    </section>
+  );
+
+  return (
+    <div className="main-wrapper">
+      <nav className="main-nav">
+        <div className="nav-logo" onClick={() => setCurrentPage('landing')}>
+          <div className="logo-icon"><TrendingUp size={20}/></div>
+          <span>FinanceAI</span>
+        </div>
+        <div className="nav-links">
+           <button onClick={() => setCurrentPage('landing')}>Solutions</button>
+           <button onClick={() => setCurrentPage('analyzer')}>The Machine</button>
+           <button className="contact-btn">Get Started</button>
+        </div>
+      </nav>
+
+      {currentPage === 'landing' && <LandingView />}
+      {currentPage === 'analyzer' && <AnalyzerView />}
+      {currentPage === 'results' && <ResultsView />}
+
+      <footer className="main-footer">
+        <p>© 2026 FinanceAI Technologies. All rights reserved.</p>
+        <div className="footer-links">Privacy • Security • Compliance</div>
+      </footer>
+    </div>
   );
 }
 
