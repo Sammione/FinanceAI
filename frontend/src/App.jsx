@@ -7,7 +7,6 @@ import { Activity, BarChart3, TrendingUp, AlertTriangle, Briefcase, ChevronRight
 const LandingView = ({ onAction }) => (
   <div className="landing-alpha-enterprise">
     <section className="hero">
-      <div className="hero-tag">ALPHA-CORE v9.0 / INSTITUTIONAL EDITION</div>
       <h1 className="hero-title">Turn Insights Into <span>Strategy</span></h1>
       <p className="hero-subtitle">The ultimate Grade-A Enterprise platform uniting BI-LSTM forecasting with interactive prescriptive strategic roadmaps. Designed for the Fortune 500 C-Suite.</p>
       
@@ -31,7 +30,7 @@ const LandingView = ({ onAction }) => (
 
       <div style={{marginTop: '60px', display: 'flex', gap: '20px', justifyContent: 'center'}}>
          <button className="btn-primary" onClick={() => onAction('analyzer')}>Initial Enterprise Engine <Zap size={18}/></button>
-         <button className="btn-secondary" style={{background:'none', border:'1px solid var(--border)', padding:'16px 32px', borderRadius:'12px', color:'white', fontWeight:700, cursor:'pointer'}}>Institutional Docs ↓</button>
+         <button className="btn-secondary" onClick={() => document.getElementById('workflow')?.scrollIntoView({behavior:'smooth'})} style={{background:'none', border:'1px solid var(--border)', padding:'16px 32px', borderRadius:'12px', color:'white', fontWeight:700, cursor:'pointer'}}>Institutional Docs ↓</button>
       </div>
     </section>
 
@@ -60,7 +59,7 @@ const LandingView = ({ onAction }) => (
     </section>
 
     {/* KPI STORYBOARD HIGHLIGHTS */}
-    <section className="workflow-section" style={{background: 'rgba(5, 8, 17, 1)'}}>
+    <section id="workflow" className="workflow-section" style={{background: 'rgba(5, 8, 17, 1)'}}>
        <h2 style={{fontSize: '2.5rem', fontWeight: 900, marginBottom: '20px'}}>Intelligence Ingest Workflow</h2>
        <p style={{color: 'var(--text-secondary)', marginBottom: '60px'}}>From raw filing ingestion to board-level decision alpha in 4 steps.</p>
        
@@ -300,8 +299,9 @@ function App() {
         )}
       </main>
 
-      <footer className="main-footer" style={{padding: '60px', opacity: 0.4, borderTop: '1px solid var(--border)', textAlign: 'center', fontSize: '0.8rem'}}>
-        © 2026 FinanceAI Institutional. Global Alpha Vectors Encrypted.
+      <footer className="main-footer" style={{padding: '60px', borderTop: '1px solid var(--border)', textAlign: 'center', fontSize: '0.8rem'}}>
+        © 2026 FinanceAI Institutional. Global Alpha Vectors Encrypted. <br/>
+        <span style={{opacity: 0.8, fontWeight: 800, marginTop: '8px', display: 'block'}}>Created by QoreLogic</span>
       </footer>
     </div>
   );
