@@ -5,6 +5,8 @@ const pdf = require('pdf-parse');
 const { OpenAI } = require('openai');
 const dotenv = require('dotenv');
 
+const xlsx = require('xlsx');
+
 dotenv.config();
 
 const app = express();
@@ -28,14 +30,24 @@ app.post('/api/analyze', upload.single('document'), async (req, res) => {
 
         let extractedText = '';
 
-        // Handle PDF files
+        // Handle File Types
         if (req.file.mimetype === 'application/pdf') {
             const data = await pdf(req.file.buffer);
             extractedText = data.text;
         } else if (req.file.mimetype === 'text/plain') {
             extractedText = req.file.buffer.toString('utf-8');
+        } else if (req.file.mimetype === 'text/csv' || 
+                   req.file.mimetype === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+                   req.file.mimetype === 'application/vnd.ms-excel') {
+            
+            // Tabular Data Handling with XLSX
+            const workbook = xlsx.read(req.file.buffer, { type: 'buffer' });
+            // Extract text from the first sheet (default behavior for financial data)
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            extractedText = xlsx.utils.sheet_to_csv(worksheet);
         } else {
-            return res.status(400).json({ error: 'Unsupported file type. Please upload a PDF or TXT file.' });
+            return res.status(400).json({ error: 'Unsupported file type. Please upload a PDF, TXT, CSV, or EXCEL file.' });
         }
 
         if (!extractedText.trim()) {
