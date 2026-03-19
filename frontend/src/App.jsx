@@ -29,7 +29,7 @@ const LandingView = ({ onAction }) => (
       </div>
 
       <div style={{marginTop: '60px', display: 'flex', gap: '20px', justifyContent: 'center'}}>
-         <button className="btn-primary" onClick={() => onAction('analyzer')}>Initial Enterprise Engine <Zap size={18}/></button>
+         <button className="btn-primary" onClick={() => onAction('analyzer')}>Start Analysis <Zap size={18}/></button>
          <button className="btn-secondary" onClick={() => document.getElementById('workflow')?.scrollIntoView({behavior:'smooth'})} style={{background:'none', border:'1px solid var(--border)', padding:'16px 32px', borderRadius:'12px', color:'white', fontWeight:700, cursor:'pointer'}}>Institutional Docs ↓</button>
       </div>
     </section>
