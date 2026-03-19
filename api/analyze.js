@@ -125,6 +125,19 @@ app.post('/api/analyze', upload.single('document'), async (req, res) => {
                                 {"type": "Fraud Risk/Cost Inflation", "severity": 9, "location": "Unit A", "correction": "Audit immediately"}
                             ]
                         },
+                        "waterfallData": [
+                            {"label": "Gross Revenue", "value": 10000000},
+                            {"label": "COGS", "value": -4000000},
+                            {"label": "OPEX", "value": -3000000},
+                            {"label": "Net Profit", "value": 3000000}
+                        ],
+                        "decisionTree": {
+                            "root": "Strategic Objective",
+                            "nodes": [
+                                {"path": "Option A", "outcome": "High Growth", "rads": 88},
+                                {"path": "Option B", "outcome": "Stability", "rads": 72}
+                            ]
+                        },
                         "advancedForecasting": {
                             "lstmModelEstimate": "Stable Growth",
                             "arimaTrend": "Rising Interest Rate Pressure",
