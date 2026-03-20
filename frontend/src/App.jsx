@@ -163,7 +163,7 @@ const MetricsMatrix = ({ metrics }) => (
 const SegmentComparativePanel = ({ segments, insights }) => (
   <div className="result-card segment-v11">
      <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px'}}>
-        <h3><Box size={16}/> Segment Intelligence</h3>
+        <h3><Box size={16}/> Segment Intelligence [ROIC: NI/CE]</h3>
         <div style={{fontSize: '0.65rem', fontWeight: 800, color: 'var(--accent-primary)', padding: '4px 12px', background: 'rgba(14, 165, 233, 0.1)', borderRadius: '100px'}}>
            STRONGEST: {insights?.strongestUnit}
         </div>
@@ -175,10 +175,11 @@ const SegmentComparativePanel = ({ segments, insights }) => (
                 <span style={{fontWeight: 900}}>{s.division}</span>
                 <span style={{color: 'var(--accent-primary)', fontWeight: 900}}>{s.roic} ROIC</span>
              </div>
-             <div style={{display: 'flex', gap: '15px', fontSize: '0.65rem', color: 'var(--text-secondary)'}}>
+             <div style={{display: 'flex', flexWrap: 'wrap', gap: '15px', fontSize: '0.65rem', color: 'var(--text-secondary)'}}>
                 <span>Revenue: {s.revenue}</span>
-                <span>Status: {s.status}</span>
+                <span>EBITDA Margin: {s.ebitdaMargin}</span>
                 <span>Source: {s.source}</span>
+                <span style={{color: 'var(--success)', opacity: 0.8}}>{s.roicFormula}</span>
              </div>
           </div>
         ))}
@@ -187,6 +188,19 @@ const SegmentComparativePanel = ({ segments, insights }) => (
         <div style={{fontSize: '0.6rem', color: 'var(--danger)', fontWeight: 900}}>WEAKEST SEGMENT IDENTIFIED</div>
         <div style={{fontSize: '0.85rem', fontWeight: 800, marginTop: '4px'}}>{insights?.weakestUnit}</div>
      </div>
+  </div>
+);
+
+const FXSensitivityMatrix = ({ fxData }) => (
+  <div className="result-card fx-v14" style={{background: 'rgba(139, 92, 246, 0.03)', border: '1px solid rgba(139, 92, 246, 0.2)'}}>
+     <div style={{display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px'}}>
+        <Globe size={16} color="var(--accent-purple)"/> 
+        <h3>±5% Currency Sensitivity</h3>
+        <span style={{fontSize: '0.6rem', padding: '2px 8px', background: 'var(--accent-purple)', borderRadius: '4px', color: 'white'}}>{fxData?.riskLevel} RISK</span>
+     </div>
+     <div style={{fontSize: '1.25rem', fontWeight: 900, marginBottom: '10px'}}>{fxData?.impactOnEbitda} Impact</div>
+     <p style={{fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '15px'}}>Exposure concentrated in: {fxData?.exposedSegments?.join(', ')}</p>
+     <div style={{fontSize: '0.6rem', opacity: 0.5}}>Logic: Dynamic FX Stress Calculation vs Monthly EBITDA</div>
   </div>
 );
 
@@ -295,6 +309,7 @@ const ResultsDashboard = ({ results, onReset, chartData, runwayMonths }) => {
           </div>
 
           <div className="dash-col-3">
+             <FXSensitivityMatrix fxData={results?.fxSensitivity} />
              <SegmentComparativePanel segments={results?.deepSegments} insights={results?.comparativeInsights} />
              <div className="export-v11-box" style={{background: 'var(--bg-card)', padding: '25px', borderRadius: '24px', border: '1px solid var(--border)'}}>
                 <h3><Download size={16}/> Ingest Output</h3>
