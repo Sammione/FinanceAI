@@ -95,8 +95,7 @@ const LandingView = ({ onAction }) => (
 );
 
 /* --- ANALYSIS & RESULTS COMPONENTS --- */
-
-const AnalyzerView = ({ loading, file, error, analyzeDocument, inputRef, handleFile }) => (
+const AnalyzerView = ({ loading, progress, file, error, analyzeDocument, inputRef, handleFile }) => (
   <div className="analyzer-alpha" style={{padding: '120px 40px'}}>
      {loading ? (
         <div className="upload-card" style={{maxWidth: '900px', padding: '100px 60px', textAlign: 'left', background: 'rgba(15, 23, 42, 0.6)'}}>
@@ -105,15 +104,17 @@ const AnalyzerView = ({ loading, file, error, analyzeDocument, inputRef, handleF
                  <div style={{fontSize: '0.75rem', color: 'var(--accent-primary)', fontWeight: 900, letterSpacing: '2px', marginBottom: '10px'}}>QUANTITATIVE SYNTHESIS ACTIVE</div>
                  <h2 style={{fontSize: '3.5rem', fontWeight: 900, letterSpacing: '-4px', lineHeight: 1}}>Synthesizing <br/>Strategic Alpha</h2>
               </div>
-              <div style={{fontSize: '4rem', fontWeight: 900, color: 'var(--accent-primary)', opacity: 0.8}}>94%</div>
+              <div style={{fontSize: '4rem', fontWeight: 900, color: 'var(--accent-primary)', opacity: 0.8}}>{progress}%</div>
            </div>
+           
            <div className="modern-progress-bar" style={{height: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px', overflow: 'hidden', marginBottom: '40px', border: '1px solid var(--border)'}}>
-              <div style={{height: '100%', width: '94%', background: 'linear-gradient(90deg, var(--accent-primary), var(--accent-secondary))', boxShadow: '0 0 20px rgba(14, 165, 233, 0.5)', borderRadius: '6px'}}></div>
+              <div style={{height: '100%', width: `${progress}%`, background: 'linear-gradient(90deg, var(--accent-primary), var(--accent-secondary))', boxShadow: '0 0 20px rgba(14, 165, 233, 0.5)', borderRadius: '6px', transition: 'width 0.3s ease-out'}}></div>
            </div>
+
            <div className="processing-subtasks" style={{display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px'}}>
               <div style={{display:'flex', alignItems:'center', gap:'10px', fontSize:'0.85rem', color:'var(--text-secondary)'}}><RefreshCw size={14} className="spin-slow" style={{color:'var(--accent-primary)'}}/> Parsing Document Structure</div>
               <div style={{display:'flex', alignItems:'center', gap:'10px', fontSize:'0.85rem', color:'var(--text-secondary)'}}><Globe size={14} className="pulse-dot" style={{color:'var(--accent-primary)'}}/> Normalizing Currency / Units</div>
-              <div style={{display:'flex', alignItems:'center', gap:'10px', fontSize:'0.85rem', color:'var(--text-secondary)'}}><GitBranch size={14} style={{color:'var(--accent-primary)'}}/> Executing Monte Carlo Paths</div>
+              <div style={{display:'flex', alignItems:'center', gap:'10px', fontSize:'0.85rem', color:'var(--accent-primary)'}}><GitBranch size={14} style={{color:'var(--accent-primary)'}}/> Executing Monte Carlo Paths</div>
               <div style={{display:'flex', alignItems:'center', gap:'10px', fontSize:'0.85rem', color:'var(--text-secondary)'}}><ShieldCheck size={14} style={{color:'var(--success)'}}/> Verifying Data Sources</div>
            </div>
         </div>
@@ -326,6 +327,7 @@ function App() {
   const [currentPage, setCurrentPage] = useState('landing');
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [error, setError] = useState('');
   const [results, setResults] = useState(null);
   const inputRef = useRef(null);
@@ -353,14 +355,29 @@ function App() {
   };
 
   const analyzeDocument = async () => {
-    if (!file) return; setLoading(true); setError('');
+    if (!file) return; 
+    setLoading(true); 
+    setError('');
+    setProgress(0);
+
+    const progressInterval = setInterval(() => {
+       setProgress(prev => {
+          if (prev >= 94) return 94;
+          const increment = Math.floor(Math.random() * 5) + 3;
+          return Math.min(prev + increment, 94);
+       });
+    }, 450);
+
     const fd = new FormData(); fd.append('document', file);
     try {
       const resp = await fetch('/api/analyze', { method: 'POST', body: fd });
       const data = await resp.json();
       if (!resp.ok) throw new Error(data.error || 'Server Internal Error');
       if (data.success && data.analysis) { setResults(data.analysis); setCurrentPage('results'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-    } catch (err) { setError(err.message); } finally { setLoading(false); }
+    } catch (err) { setError(err.message); } finally { 
+       clearInterval(progressInterval);
+       setLoading(false); 
+    }
   };
 
   const chartData = useMemo(() => {
@@ -400,7 +417,7 @@ function App() {
         {currentPage === 'landing' && <LandingView onAction={setCurrentPage} />}
         {currentPage === 'analyzer' && (
             <AnalyzerView 
-                loading={loading} file={file} error={error}
+                loading={loading} progress={progress} file={file} error={error}
                 analyzeDocument={analyzeDocument} inputRef={inputRef} handleFile={handleFile}
             />
         )}
