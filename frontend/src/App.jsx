@@ -7,90 +7,83 @@ import { Activity, BarChart3, TrendingUp, AlertTriangle, Briefcase, ChevronRight
 const LandingView = ({ onAction }) => (
   <div className="landing-alpha-enterprise">
     <section className="hero">
-      <h1 className="hero-title">Turn Insights Into <span>Strategy</span></h1>
-      <p className="hero-subtitle">The ultimate Grade-A Adaptive platform. Intelligently parsing multi-segment filings from any currency, standard, or structure into board-ready execution roadmaps.</p>
+      <div className="hero-tag">ENTERPRISE ADAPTIVE V17.5</div>
+      <h1 className="hero-title">Neural Financial <br/><span>Intelligence</span></h1>
+      <p className="hero-subtitle">The ultimate institutional platform for board-ready data synthesis. Intelligently parsing multi-segment filings from any currency or reporting standard into high-fidelity execution roadmaps with 100% evidentiary truth.</p>
       
       <div className="hero-preview">
          <div className="floating-kpi">
-            <span style={{fontSize: '0.6rem', color: 'var(--text-secondary)'}}>TOTAL REVENUE</span>
+            <span style={{fontSize: '0.65rem', color: 'var(--accent-primary)', fontWeight: 800}}>TOTAL REVENUE</span>
             <div className="val-big">$10.2B</div>
             <div className="v-ticker"><ArrowUpRight size={12}/> +2.1% YoY</div>
          </div>
-         <div className="floating-kpi">
-            <span style={{fontSize: '0.6rem', color: 'var(--text-secondary)'}}>ROIC [GLOBAL]</span>
+         <div className="floating-kpi active-kpi">
+            <span style={{fontSize: '0.65rem', color: 'var(--accent-primary)', fontWeight: 800}}>SYSTEM ROIC</span>
             <div className="val-big">16.8%</div>
             <div className="v-ticker" style={{color: 'var(--success)'}}>TA: 15.0%</div>
          </div>
          <div className="floating-kpi">
-            <span style={{fontSize: '0.6rem', color: 'var(--text-secondary)'}}>NET DEBT / EBITDA</span>
+            <span style={{fontSize: '0.65rem', color: 'var(--accent-primary)', fontWeight: 800}}>LIQUIDITY INDEX</span>
             <div className="val-big">1.4x</div>
-            <div className="v-ticker" style={{color: 'var(--accent-primary)'}}>HEALTHY</div>
+            <div className="v-ticker" style={{color: 'var(--accent-primary)'}}>SOLVENT</div>
          </div>
       </div>
 
       <div style={{marginTop: '60px', display: 'flex', gap: '20px', justifyContent: 'center'}}>
-         <button className="btn-primary" onClick={() => onAction('analyzer')}>Start Analysis <Zap size={18}/></button>
-         <button className="btn-secondary" onClick={() => document.getElementById('workflow')?.scrollIntoView({behavior:'smooth'})} style={{background:'none', border:'1px solid var(--border)', padding:'16px 32px', borderRadius:'12px', color:'white', fontWeight:700, cursor:'pointer'}}>Institutional Docs ↓</button>
+         <button className="btn-primary" onClick={() => onAction('analyzer')} style={{padding: '20px 48px', fontSize: '1.2rem'}}>Start Strategic Analysis <Zap size={18}/></button>
+         <button className="btn-secondary" onClick={() => document.getElementById('workflow')?.scrollIntoView({behavior:'smooth'})} style={{background:'rgba(255,255,255,0.05)', border:'1px solid var(--border)', padding:'20px 48px', borderRadius:'12px', color:'white', fontWeight:700, cursor:'pointer', fontSize: '1rem'}}>Ingest Protocol ↓</button>
       </div>
     </section>
 
-    {/* 4-QUADRANT COMMAND CENTER */}
+    {/* COMMAND CENTER GRID */}
     <section className="cta-grid">
        <div className="cta-card" onClick={() => onAction('analyzer')}>
-          <div className="cta-icon"><FileText size={24}/></div>
-          <h3>Analyze SEC Filing</h3>
-          <p>Extract institutional data, multi-segment ROIC, and prescriptive strategies from any 10-K/10-Q/Annual Report.</p>
+          <div className="cta-icon"><Database size={32}/></div>
+          <h3 style={{fontSize: '1.4rem', fontWeight: 900}}>Analyze SEC Filing</h3>
+          <p>Extract institutional data, multi-segment ROIC, and prescriptive strategy vectors from any 10-K/10-Q/Annual Filing.</p>
        </div>
        <div className="cta-card" onClick={() => onAction('analyzer')}>
-          <div className="cta-icon"><GitBranch size={24}/></div>
-          <h3>Run Scenario Studio</h3>
-          <p>Stress-test divisional solvency and Monte Carlo profitability under dynamic interest rate and inflation shocks.</p>
+          <div className="cta-icon"><GitBranch size={32}/></div>
+          <h3 style={{fontSize: '1.4rem', fontWeight: 900}}>Monte Carlo Studio</h3>
+          <p>Execute 12,000-pass probabilistic models to stress-test divisional solvency under dynamic inflation and interest rate shocks.</p>
        </div>
        <div className="cta-card" onClick={() => onAction('analyzer')}>
-          <div className="cta-icon"><Shield size={24}/></div>
-          <h3>Global Risk Dashboard</h3>
-          <p>Multi-source anomaly detector for operational gaps, accounting inconsistencies, and sectoral risks.</p>
+          <div className="cta-icon"><Shield size={32}/></div>
+          <h3 style={{fontSize: '1.4rem', fontWeight: 900}}>Global Risk Matrix</h3>
+          <p>Institutional anomaly detector for accounting variations, FX exposure, and sectoral risk signals.</p>
        </div>
        <div className="cta-card" onClick={() => onAction('analyzer')}>
-          <div className="cta-icon"><TrendingUp size={24}/></div>
-          <h3>Generate Board Report</h3>
-          <p>Extract verifiable, source-referenced executive briefings with automated Waterfall and Bridge visualizations.</p>
+          <div className="cta-icon"><Target size={32}/></div>
+          <h3 style={{fontSize: '1.4rem', fontWeight: 900}}>Executive Briefings</h3>
+          <p>Generate board-ready, source-page referenced summaries with automated Waterfall and Bridge visualizations.</p>
        </div>
     </section>
 
-    <section id="workflow" className="workflow-section" style={{background: 'rgba(5, 8, 17, 1)'}}>
-       <h2 style={{fontSize: '2.5rem', fontWeight: 900, marginBottom: '20px'}}>Intelligence Ingest Workflow</h2>
+    <section id="workflow" className="workflow-section">
+       <h2 style={{fontSize: '3rem', fontWeight: 900, marginBottom: '20px', letterSpacing: '-2px'}}>Data Ingest Machina</h2>
        <div className="workflow-grid">
           <div className="wf-step">
-             <div className="wf-icon-box"><Database size={24}/></div>
+             <div className="wf-icon-box"><RefreshCw size={24} className="spin-slow"/></div>
              <h4>Neural Ingest</h4>
-             <p>Automated parsing of institutional documents, Page-by-Page.</p>
+             <p>Automated OCR and parsing of institutional filings, Page-by-Page.</p>
           </div>
           <div className="wf-step">
              <div className="wf-icon-box"><Globe size={24}/></div>
              <h4>Normalization</h4>
-             <p>Currency detection and unit scaling (Millions/Billions).</p>
+             <p>Automated currency detection and logic-based unit scaling (M/B).</p>
           </div>
           <div className="wf-step">
-             <div className="wf-icon-box"><Zap size={24}/></div>
-             <h4>Decision Alpha</h4>
-             <p>Scenario simulation linked to specific segment ROIC data.</p>
+             <div className="wf-icon-box"><Target size={24}/></div>
+             <h4>Segment Alpha</h4>
+             <p>Divisional ROIC logic linked directly to audited segment Net Income.</p>
           </div>
           <div className="wf-step">
-             <div className="wf-icon-box"><FileText size={24}/></div>
-             <h4>Verification</h4>
-             <p>Every metric referenced back to the source document location.</p>
+             <div className="wf-icon-box"><ShieldCheck size={24}/></div>
+             <h4>Truth Check</h4>
+             <p>Every extracted metric referenced to the source document and page.</p>
           </div>
        </div>
     </section>
-
-    <footer className="security-banner" style={{padding:'60px', opacity:0.6}}>
-       <div style={{display:'flex', gap:'40px', justifyContent:'center'}}>
-          <span style={{fontSize:'0.65rem', fontWeight:900, letterSpacing:'2px'}}>AES-256 ENCRYPTED</span>
-          <span style={{fontSize:'0.65rem', fontWeight:900, letterSpacing:'2px'}}>SEC/EDGAR COMPLIANT</span>
-          <span style={{fontSize:'0.65rem', fontWeight:900, letterSpacing:'2px'}}>GDPR PROTECTED</span>
-       </div>
-    </footer>
   </div>
 );
 
@@ -222,10 +215,10 @@ const ResultsDashboard = ({ results, onReset, chartData, runwayMonths }) => {
   }
 
   return (
-    <div className="adaptive-results-master" style={{padding: '40px'}}>
+    <div className="adaptive-results-master" style={{padding: '40px', position: 'relative', zIndex: 10, background: 'var(--bg-primary)', minHeight: '100vh', width: '100%'}}>
        <div className="expert-header" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '40px', paddingLeft: '25px', borderLeft: '6px solid var(--accent-primary)'}}>
           <div>
-             <div style={{fontSize: '0.7rem', color: 'var(--accent-primary)', fontWeight: 900, letterSpacing: '2px'}}>ADAPTIVE_CORE V11_MASTER</div>
+             <div style={{fontSize: '0.7rem', color: 'var(--accent-primary)', fontWeight: 900, letterSpacing: '2px'}}>ADAPTIVE_CORE V17.5_MASTER</div>
              <h1 style={{fontSize: '3.5rem', fontWeight: 900, letterSpacing: '-4px'}}>{results?.sentiment} EXECUTIVE POSITIONING</h1>
              <div style={{display: 'flex', gap: '20px', marginTop: '10px', fontSize: '0.75rem', opacity: 0.6}}>
                 <span><Globe size={12}/> Reported: {results?.reportingMetadata?.originalCurrency} ({results?.reportingMetadata?.units})</span>
@@ -340,6 +333,7 @@ function App() {
     setLoading(true); 
     setError('');
     setProgress(0);
+    console.log("[FinanceAI] Initializing Strategic Analysis for:", file.name);
 
     const progressInterval = setInterval(() => {
        setProgress(prev => {
@@ -353,9 +347,19 @@ function App() {
     try {
       const resp = await fetch('/api/analyze', { method: 'POST', body: fd });
       const data = await resp.json();
+      console.log("[FinanceAI] Neural Data Received:", data);
+      
       if (!resp.ok) throw new Error(data.error || 'Server Internal Error');
-      if (data.success && data.analysis) { setResults(data.analysis); setCurrentPage('results'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-    } catch (err) { setError(err.message); } finally { 
+      if (data.success && data.analysis) { 
+         setResults(data.analysis); 
+         setCurrentPage('results'); 
+         console.log("[FinanceAI] Transitioning to Executive Dashboard.");
+         window.scrollTo({ top: 0, behavior: 'smooth' }); 
+      }
+    } catch (err) { 
+       console.error("[FinanceAI] Analysis Fatal Error:", err);
+       setError(err.message); 
+    } finally { 
        clearInterval(progressInterval);
        setLoading(false); 
     }
