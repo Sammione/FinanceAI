@@ -77,6 +77,11 @@ app.post('/api/analyze', upload.single('document'), async (req, res) => {
                     5. Compute RADS (Risk-Adjusted Decision Score) by weighting: Revenue Growth, Segment ROIC, EBITDA Margin, Debt-to-Equity, and FX Exposure.
                     6. Include a "currencySensitivity" matrix for ±5% FX shifts.
                     
+                    CROSS-VERIFICATION STEP:
+                    - Before finalizing the JSON, double-check every numerical value against the extracted text.
+                    - If you cannot find a specific value (e.g., monthly OPEX), return 0 and do NOT invent a number based on context.
+                    - If no significant financial data is found, set "analysisSuccessful": false.
+                    
                     Return ONLY a JSON object:
                     {
                         "analysisSuccessful": true/false,
