@@ -266,7 +266,7 @@ const ResultsDashboard = ({ results, onReset, chartData, runwayMonths }) => {
                      <div style={{display: 'flex', justifyContent: 'space-between'}}>
                         <span style={{fontSize: '0.7rem', fontWeight: 900}}>Lv.{a.severity} {a.type}</span>
                         <AlertCircle size={14} color="var(--danger)"/>
-                     </div>
+                      </div>
                      <p style={{fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '6px'}}>{a.correction}</p>
                   </div>
                 ))}
@@ -274,31 +274,12 @@ const ResultsDashboard = ({ results, onReset, chartData, runwayMonths }) => {
           </div>
 
           <div className="dash-col-2">
-             <div className="result-card chart-master">
-                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px'}}>
-                   <div>
-                      <h3 style={{fontSize: '1.75rem', fontWeight: 900}}>Adaptive Monte Carlo Forecast</h3>
-                      <p style={{fontSize: '0.8rem', color: 'var(--text-secondary)'}}>Bi-LSTM Forecast Confidence: {results?.advancedForecasting?.confidenceInterval}</p>
-                   </div>
-                   <div style={{textAlign: 'right'}}>
-                      <span style={{fontSize: '0.75rem', fontWeight: 800, opacity: 0.5}}>CASH RUNWAY</span>
-                      <div style={{fontSize: '2.5rem', fontWeight: 900, color: runwayMonths.includes('>') ? 'var(--success)' : 'var(--danger)'}}>{runwayMonths}</div>
-                   </div>
-                </div>
-                <ResponsiveContainer width="100%" height={320}>
-                   <AreaChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                      <XAxis dataKey="month" stroke="var(--text-secondary)" fontSize={11} />
-                      <Tooltip contentStyle={{background: 'var(--bg-primary)', border: '1px solid var(--border)'}} />
-                      <Area type="monotone" dataKey="bestCase" stroke="var(--success)" fill="none" strokeDasharray="5 5" />
-                      <Area type="monotone" dataKey="worstCase" stroke="var(--danger)" fill="none" strokeDasharray="5 5" />
-                      <Area type="monotone" dataKey="cashReserves" stroke="var(--accent-primary)" strokeWidth={5} fill="rgba(14, 165, 233, 0.15)" />
-                   </AreaChart>
-                </ResponsiveContainer>
-                <div className="adaptive-info" style={{marginTop: '25px', padding: '15px', background: 'rgba(0,0,0,0.2)', borderRadius: '12px', fontSize: '0.7rem', color: 'var(--text-secondary)'}}>
-                   <Info size={14} style={{verticalAlign: 'middle', marginRight: '6px'}}/> Data Normalized to {currencyMode.toUpperCase()} | Stress Testing applied to Revenue and Cost parameters.
-                </div>
+             <MonteCarloScenarioStudio data={chartData} runway={runwayMonths} />
+             
+             <div className="adaptive-info" style={{marginTop: '25px', padding: '15px', background: 'rgba(0,0,0,0.2)', borderRadius: '12px', fontSize: '0.7rem', color: 'var(--text-secondary)', marginBottom: '30px'}}>
+                <Info size={14} style={{verticalAlign: 'middle', marginRight: '6px'}}/> Data Normalized to {currencyMode.toUpperCase()} | Statistical Simulation Executed with 1,000 passes.
              </div>
+
              <div className="cfo-advisor-master" style={{background: 'rgba(2, 6, 23, 0.95)', border: '1px solid var(--accent-primary)', borderRadius: '30px', padding: '30px', position: 'relative'}}>
                 <div style={{background: 'var(--accent-primary)', color: 'white', padding: '6px 16px', borderRadius: '100px', display: 'inline-block', fontSize: '0.7rem', fontWeight: 900, marginBottom: '20px'}}>AI CFO ADVISOR</div>
                 <p style={{fontSize: '1.1rem', fontWeight: 700, lineHeight: 1.4, marginBottom: '20px'}}>Based on the {results?.comparativeInsights?.strongestUnit} performance, I recommend accelerating R&D spend to capture a projected 4.5% EBITDA lift by Q3. The currency-adjusted risk on your {results?.comparativeInsights?.weakestUnit} is Medium.</p>
@@ -312,7 +293,7 @@ const ResultsDashboard = ({ results, onReset, chartData, runwayMonths }) => {
           <div className="dash-col-3">
              <FXSensitivityMatrix fxData={results?.fxSensitivity} />
              <SegmentComparativePanel segments={results?.deepSegments} insights={results?.comparativeInsights} />
-             <div className="export-v11-box" style={{background: 'var(--bg-card)', padding: '25px', borderRadius: '24px', border: '1px solid var(--border)'}}>
+             <div className="export-v11-box" style={{background: 'var(--bg-card)', padding: '25px', borderRadius: '24px', border: '1px solid var(--border)', marginTop: '20px'}}>
                 <h3><Download size={16}/> Ingest Output</h3>
                 <p style={{fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '10px 0 20px'}}>Verifiable PDF/PPT export with source-page markers for every analytical node.</p>
                 <button className="btn-primary" style={{width: '100%', justifyContent: 'center', fontSize: '0.85rem'}}>Export Board Deck</button>
@@ -380,23 +361,12 @@ function App() {
     }
   };
 
-  const chartData = useMemo(() => {
-    if (!results || !results.baselineFinancials) return [];
-    const b = results.baselineFinancials;
-    const m = results.monteCarlo || { bestCaseRevenueGrowth: 1.05, worstCaseRevenueGrowth: 0.95 };
-    const months = [];
-    let cC = b.currentCashReserves, bC = b.currentCashReserves, wC = b.currentCashReserves;
-    for (let i = 0; i <= 12; i++) {
-        if (i > 0) { const r = b.monthlyRevenue, e = b.monthlyOperatingExpenses; cC += (r - e); bC += (r * m.bestCaseRevenueGrowth - e); wC += (r * m.worstCaseRevenueGrowth - e); }
-        months.push({ month: `M${i}`, cashReserves: Math.floor(cC), bestCase: Math.floor(bC), worstCase: Math.floor(wC) });
-    }
-    return months;
-  }, [results]);
-
+  const chartData = results?.monteCarloEngineResult?.months || [];
+  
   const runwayMonths = useMemo(() => {
-    if(!chartData.length) return 0;
-    const idx = chartData.findIndex(d => d.cashReserves <= 0);
-    return idx === -1 ? '>12 Months' : `${idx} Months`;
+     if (!chartData.length) return 0;
+     const breakIdx = chartData.findIndex(m => m.cashReserves <= 0);
+     return breakIdx === -1 ? 12 : breakIdx;
   }, [chartData]);
 
   return (

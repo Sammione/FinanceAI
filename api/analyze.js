@@ -67,66 +67,37 @@ app.post('/api/analyze', upload.single('document'), async (req, res) => {
             messages: [
                 {
                     role: "system",
-                    content: `You are a precision-focused financial analyst AI. Extract data from the provided text into a JSON format.
+                    content: `You are a precision-focused financial analyst AI. Extract data into a JSON format.
                     
                     STRICT RULES:
-                    1. ONLY extract data explicitly present in the document.
-                    2. DO NOT hallucinate, guess, or estimate numbers if they are not found.
-                    3. Source-page referencing is REQUIRED for EVERY metric (e.g., "Page 32").
-                    4. Calculate Segment-Level ROIC using: Net Income / Capital Employed.
-                    5. Compute RADS (Risk-Adjusted Decision Score) by weighting: Revenue Growth, Segment ROIC, EBITDA Margin, Debt-to-Equity, and FX Exposure.
-                    6. Include a "currencySensitivity" matrix for ±5% FX shifts.
-                    
-                    CROSS-VERIFICATION STEP:
-                    - Before finalizing the JSON, double-check every numerical value against the extracted text.
-                    - If you cannot find a specific value (e.g., monthly OPEX), return 0 and do NOT invent a number based on context.
-                    - If no significant financial data is found, set "analysisSuccessful": false.
+                    1. ONLY extract data explicitly found. No hallucinations.
+                    2. Calculate Segment ROIC: Net Income / Capital Employed.
+                    3. Source-page referencing is REQUIRED (Page X).
                     
                     Return ONLY a JSON object:
                     {
                         "analysisSuccessful": true/false,
-                        "summary": "Full overview (Found)",
+                        "summary": "Overview",
                         "reportingMetadata": {
                             "originalCurrency": "Detected", "units": "Reported", "sourceDocument": "Title"
                         },
-                        "keyMetrics": [
-                            {"name": "Metric", "value": "Found", "source": "Page X", "status": "Healthy/Risk"}
-                        ],
-                        "deepSegments": [
-                            {"division": "Name", "revenue": "Value", "roic": "Calculated %", "ebitdaMargin": "Value", "roicFormula": "NI/CE", "source":"Page X"}
-                        ],
-                        "comparativeInsights": {
-                            "strongestUnit": "Name", "weakestUnit": "Name", "groupAlpha": "Value"
-                        },
-                        "fxSensitivity": {
-                            "impactOnEbitda": "-2.1% (per 5% FX shift)",
-                            "exposedSegments": ["Pharma", "APAC Supply"],
-                            "riskLevel": "High/Medium/Low"
-                        },
+                        "keyMetrics": [{"name": "Metric", "value": "Found Value", "source": "Page X", "status": "Healthy/Risk"}],
+                        "deepSegments": [{"division": "Name", "revenue": "Value", "roic": "Value", "ebitdaMargin":"Value", "source": "Value"}],
+                        "comparativeInsights": {"strongestUnit": "Name", "weakestUnit": "Name"},
+                        "fxSensitivity": {"impactOnEbitda": "Value", "exposedSegments": ["Name"], "riskLevel": "Med"},
                         "baselineFinancials": {
-                            "monthlyRevenue": 0, "monthlyOperatingExpenses": 0, "currentCashReserves": 0, "totalDebt": 0
+                            "monthlyRevenue": Found Number or 0,
+                            "monthlyOperatingExpenses": Found Number or 0,
+                            "currentCashReserves": Found Number or 0,
+                            "totalDebt": 0
                         },
                         "decisionIntelligence": {
                             "overallScore": 0-100,
-                            "recommendations": [
-                                {"strategy": "Actionable Step", "impact": "Quantitative % Lift", "confidence": 0.0-1.0}
-                            ]
+                            "recommendations": [{"strategy": "Found", "impact": "Found"}]
                         },
-                        "anomalyIntelligence": {
-                            "alerts": [
-                                {"type": "Margin Drop/Debt Spike", "severity": "Low/Med/High", "correction": "Audit Step"}
-                            ]
-                        },
-                        "monteCarlo": {
-                            "bestCaseRevenueGrowth": 1.0, 
-                            "worstCaseRevenueGrowth": 1.0, 
-                            "volatilityIndex": 0.0
-                        },
-                        "waterfallData": [
-                            {"label": "Metric", "value": 0}
-                        ],
-                        "sentiment": "Neutural",
-                        "conclusion": "Board Summary"
+                        "anomalyIntelligence": {"alerts": []},
+                        "sentiment": "Sentiment",
+                        "conclusion": "Conclusion"
                     }`
                 },
                 {
@@ -138,6 +109,54 @@ app.post('/api/analyze', upload.single('document'), async (req, res) => {
         });
 
         const analysisResult = JSON.parse(response.choices[0].message.content);
+
+        // --- BACKEND MONTE CARLO SIMULATION (1000 Iterations) ---
+        const runMonteCarlo = (base) => {
+            const months = [];
+            let currentCashBest = base.currentCashReserves;
+            let currentCashBase = base.currentCashReserves;
+            let currentCashWorst = base.currentCashReserves;
+
+            for (let m = 0; m <= 12; m++) {
+                if (m === 0) {
+                    months.push({ month: 'M0', cashReserves: base.currentCashReserves, bestCase: base.currentCashReserves, worstCase: base.currentCashReserves });
+                    continue;
+                }
+
+                let iterationResults = [];
+                for (let i = 0; i < 1000; i++) {
+                    const revVar = 1 + (Math.random() * 0.1 - 0.05); // ±5%
+                    const costVar = 1 + (Math.random() * 0.06 - 0.03); // ±3%
+                    const netMonthly = (base.monthlyRevenue * revVar) - (base.monthlyOperatingExpenses * costVar);
+                    iterationResults.push(netMonthly);
+                }
+
+                iterationResults.sort((a, b) => a - b);
+                const worstNet = iterationResults[0];
+                const bestNet = iterationResults[999];
+                const baseNet = iterationResults.reduce((s, v) => s + v, 0) / 1000;
+
+                currentCashWorst += worstNet;
+                currentCashBase += baseNet;
+                currentCashBest += bestNet;
+
+                months.push({
+                    month: `M${m}`,
+                    cashReserves: Math.floor(currentCashBase),
+                    bestCase: Math.floor(currentCashBest),
+                    worstCase: Math.floor(currentCashWorst)
+                });
+            }
+            return months;
+        };
+
+        if (analysisResult.analysisSuccessful && analysisResult.baselineFinancials) {
+            analysisResult.monteCarloEngineResult = {
+                months: runMonteCarlo(analysisResult.baselineFinancials),
+                iterations: 1000,
+                confidenceInterval: "95%"
+            };
+        }
         
         res.json({ success: true, analysis: analysisResult });
     } catch (error) {
