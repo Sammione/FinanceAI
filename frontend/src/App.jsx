@@ -198,6 +198,38 @@ const FXSensitivityMatrix = ({ fxData }) => (
   </div>
 );
 
+const MonteCarloScenarioStudio = ({ data, runway }) => (
+  <div className="result-card monte-v11">
+     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px'}}>
+        <div>
+           <h3><GitBranch size={16}/> Monte Carlo Scenario Studio</h3>
+           <p style={{fontSize: '0.65rem', color: 'var(--text-secondary)', marginTop: '4px'}}>
+              Executing <b>1,000 iterations</b> per month | 95% Confidence Interval
+           </p>
+        </div>
+        <div style={{fontSize: '1.4rem', fontWeight: 900, color: runway === 12 ? 'var(--success)' : 'var(--danger)'}}>
+           {runway === 12 ? '>12' : runway} <span style={{fontSize: '0.75rem', opacity: 0.6}}>Months Runway</span>
+        </div>
+     </div>
+     <div style={{height: '300px', width: '100%'}}>
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={data}>
+            <defs>
+              <linearGradient id="colorCash" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="var(--accent-primary)" stopOpacity={0.3}/><stop offset="95%" stopColor="var(--accent-primary)" stopOpacity={0}/></linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+            <XAxis dataKey="month" stroke="rgba(255,255,255,0.3)" fontSize={10} tickLine={false} axisLine={false} />
+            <YAxis stroke="rgba(255,255,255,0.3)" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(v) => `$${(v/1000000).toFixed(1)}M`} />
+            <Tooltip contentStyle={{background: '#1e293b', border: '1px solid var(--border)', borderRadius: '12px', fontSize: '12px'}} />
+            <Area type="monotone" dataKey="bestCase" stroke="transparent" fill="var(--success)" fillOpacity={0.05} />
+            <Area type="monotone" dataKey="worstCase" stroke="transparent" fill="var(--danger)" fillOpacity={0.05} />
+            <Area type="monotone" dataKey="cashReserves" stroke="var(--accent-primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorCash)" />
+          </AreaChart>
+        </ResponsiveContainer>
+     </div>
+  </div>
+);
+
 const ResultsDashboard = ({ results, onReset, chartData, runwayMonths }) => {
   const [currencyMode, setCurrencyMode] = useState('reported'); // 'reported' or 'base'
   
