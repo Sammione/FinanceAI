@@ -12,3 +12,11 @@ yarn-error.log*
 .gemini/
 brain/
 implementation_walkthrough.md
+
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+.pytest_cache/
