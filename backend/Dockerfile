@@ -15,9 +15,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Expose the port FastAPI will run on
-EXPOSE 8080
-
-# Command to run the application
-# We use uvicorn for local development, but Gunicorn with uvicorn workers for production
-CMD ["gunicorn", "api.main:app", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:8080", "--timeout", "120"]
+# Use a shell-form for CMD to allow environment variable expansion
+CMD gunicorn api.main:app -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:$PORT --timeout 120
