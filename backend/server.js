@@ -66,37 +66,53 @@ app.post('/api/analyze', upload.single('document'), async (req, res) => {
             messages: [
                 {
                     role: "system",
-                    content: `You are a precision-focused financial analyst AI. Extract data into a JSON format.
+                    content: `You are an expert Financial Analyst AI designed to help business consultants and accountants. 
+                    Extract data into a clean JSON format. Focus on clear, professional business language instead of technical jargon.
+                    
+                    ANALYSIS CATEGORIES:
+                    - Analysis Mode: ${req.body.mode || 'standard'} (Standard, Executive, or Deep-Dive)
                     
                     STRICT RULES:
-                    1. ONLY extract data explicitly found. No hallucinations.
-                    2. Calculate Segment ROIC: Net Income / Capital Employed.
-                    3. Source-page referencing is REQUIRED (Page X).
+                    1. ONLY extract data explicitly found in the text. Do not hallucinate.
+                    2. Calculate key performance ratios:
+                       - ROI (Return on Investment)
+                       - ROCE (Return on Capital Employed)
+                       - Operating Margin
+                       - Net Profit Margin
+                       - Gross Margin (if COGS is available)
+                    3. For segments, extract: Revenue, Operating Profit (EBIT), and Asset Base.
+                    4. Identify specific business risks (e.g., liquidity, market competition, currency).
                     
                     Return ONLY a JSON object:
                     {
                         "analysisSuccessful": true/false,
-                        "summary": "Overview",
+                        "businessOverview": "Clear summary of the company's status and goals",
                         "reportingMetadata": {
                             "originalCurrency": "Detected", "units": "Reported", "sourceDocument": "Title"
                         },
-                        "keyMetrics": [{"name": "Metric", "value": "Found Value", "source": "Page X", "status": "Healthy/Risk"}],
-                        "deepSegments": [{"division": "Name", "revenue": "Value", "roic": "Value", "ebitdaMargin":"Value", "source": "Value"}],
-                        "comparativeInsights": {"strongestUnit": "Name", "weakestUnit": "Name"},
-                        "fxSensitivity": {"impactOnEbitda": "Value", "exposedSegments": ["Name"], "riskLevel": "Med"},
+                        "keyPerformanceIndicators": [
+                            {"name": "Metric Name", "value": "Found Value", "benchmark": "Target/Previous", "description": "What this means for the user"}
+                        ],
+                        "profitabilityAnalysis": {
+                            "grossMargin": "Value", "operatingMargin": "Value", "netMargin": "Value", "roi": "Value", "roce": "Value"
+                        },
+                        "segmentBreakdown": [
+                            {"name": "Division", "revenue": "Value", "profit": "Value", "roic": "Value", "context": "Brief insight"}
+                        ],
+                        "riskAssessment": {
+                            "riskLevel": "Low/Medium/High",
+                            "keyRisks": [{"type": "category", "finding": "description", "severity": "1-10"}]
+                        },
                         "baselineFinancials": {
-                            "monthlyRevenue": 0,
-                            "monthlyOperatingExpenses": 0,
-                            "currentCashReserves": 0,
-                            "totalDebt": 0
+                            "monthlyRevenue": 0, "monthlyOperatingExpenses": 0, "currentCashReserves": 0, "totalDebt": 0
                         },
-                        "decisionIntelligence": {
-                            "overallScore": 0-100,
-                            "recommendations": [{"strategy": "Found", "impact": "Found"}]
+                        "strategicRecommendations": [
+                            {"action": "Specific business step", "expectedImpact": "measurable outcome", "priority": "High/Med/Low"}
+                        ],
+                        "detailedBreakdown": {
+                            "salesGrowth": "Value", "operatingProfitChange": "Value", "netIncomeTrend": "Value"
                         },
-                        "anomalyIntelligence": {"alerts": []},
-                        "sentiment": "Sentiment",
-                        "conclusion": "Conclusion"
+                        "sentiment": "Overall Outlook"
                     }`
                 },
                 {
