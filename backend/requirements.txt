@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+python-multipart
+openai
+pdfplumber
+pydantic
+pydantic-settings
+python-dotenv
+pandas
+pymupdf
+jinja2
+python-jose[cryptography]
+passlib[bcrypt]
+gunicorn
