@@ -55,11 +55,42 @@ app.post('/api/analyze', upload.single('document'), async (req, res) => {
             return res.status(400).json({ error: 'Could not extract text from document.' });
         }
 
-        // Limit the text to avoid token limits for basic testing
-        const maxLength = 40000;
-        const truncatedText = extractedText.length > maxLength 
-            ? extractedText.substring(0, maxLength) 
-            : extractedText;
+        // --- SMART EXTRACTION LOGIC (v2.1) ---
+        // Large reports (200+ pages) have financials deep in the document.
+        // Instead of taking the first 40k chars, we search for financial anchors.
+        
+        let smartContent = "";
+        const anchors = [
+            "Consolidated Income Statement",
+            "Consolidated Statement of Profit or Loss",
+            "Consolidated Balance Sheet",
+            "Consolidated Statement of Cash Flows",
+            "Notes to the Financial Statements",
+            "Key Financial Highlights"
+        ];
+        
+        const anchorHits = [];
+        anchors.forEach(term => {
+            const idx = extractedText.toLowerCase().indexOf(term.toLowerCase());
+            if (idx !== -1) anchorHits.push(idx);
+        });
+
+        if (anchorHits.length > 0) {
+            // Take slices around the anchors
+            anchorHits.sort((a,b) => a-b);
+            anchorHits.forEach((pos, i) => {
+                if (i > 3) return; // Limit to 4 key sections
+                const start = Math.max(0, pos - 5000);
+                const end = Math.min(extractedText.length, pos + 25000);
+                smartContent += `\n--- [SECTION: ${anchors[i] || 'Financial Data'}] ---\n`;
+                smartContent += extractedText.substring(start, end) + "\n";
+            });
+        } else {
+            // Fallback to first 40k characters if no anchors found
+            smartContent = extractedText.substring(0, 40000);
+        }
+
+        const truncatedText = smartContent;
 
         const response = await openai.chat.completions.create({
             model: "gpt-4o",
