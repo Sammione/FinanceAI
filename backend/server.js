@@ -56,7 +56,7 @@ app.post('/api/analyze', upload.single('document'), async (req, res) => {
         }
 
         // Limit the text to avoid token limits for basic testing
-        const maxLength = 12000;
+        const maxLength = 40000;
         const truncatedText = extractedText.length > maxLength 
             ? extractedText.substring(0, maxLength) 
             : extractedText;
@@ -66,48 +66,42 @@ app.post('/api/analyze', upload.single('document'), async (req, res) => {
             messages: [
                 {
                     role: "system",
-                    content: `You are an expert Financial Analyst AI designed to help business consultants and accountants. 
-                    Extract data into a clean JSON format. Focus on clear, professional business language instead of technical jargon.
+                    content: `You are an expert Financial Analyst AI. Extract data into a clean JSON format.
+                    
+                    STRICT DATA RULES:
+                    1. MAGNITUDE CHECK: Most corporate reports use Millions (M) or Billions (B). Normalize all 'baselineFinancials' to ABSOLUTE numbers (e.g., if report says 10.5B, return 10500000000).
+                    2. NO HALLUCINATION: If a metric is missing, return 'N/A' for strings or 0 for numeric fields. 
+                    3. RATIO CALCULATION: If the report provides raw numbers (e.g. Total Assets, Net Income) but not the ratio (e.g. ROI), YOU must calculate it.
+                    4. CLEAN NUMBERS: Ensure all 'baselineFinancials' are numeric types, NO commas or symbols.
                     
                     ANALYSIS CATEGORIES:
-                    - Analysis Mode: ${req.body.mode || 'standard'} (Standard, Executive, or Deep-Dive)
-                    
-                    STRICT RULES:
-                    1. ONLY extract data explicitly found in the text. Do not hallucinate.
-                    2. Calculate key performance ratios:
-                       - ROI (Return on Investment)
-                       - ROCE (Return on Capital Employed)
-                       - Operating Margin
-                       - Net Profit Margin
-                       - Gross Margin (if COGS is available)
-                    3. For segments, extract: Revenue, Operating Profit (EBIT), and Asset Base.
-                    4. Identify specific business risks (e.g., liquidity, market competition, currency).
+                    - Analysis Mode: ${req.body.mode || 'standard'}
                     
                     Return ONLY a JSON object:
                     {
-                        "analysisSuccessful": true/false,
-                        "businessOverview": "Clear summary of the company's status and goals",
+                        "analysisSuccessful": true,
+                        "businessOverview": "Concise summary",
                         "reportingMetadata": {
-                            "originalCurrency": "Detected", "units": "Reported", "sourceDocument": "Title"
+                            "originalCurrency": "CHF/USD/etc", "units": "Reported Units (Millions/Billions)", "sourceDocument": "Title"
                         },
                         "keyPerformanceIndicators": [
-                            {"name": "Metric Name", "value": "Found Value", "benchmark": "Target/Previous", "description": "What this means for the user"}
+                            {"name": "Metric Name", "value": "Number + %/$", "description": "Business meaning"}
                         ],
                         "profitabilityAnalysis": {
-                            "grossMargin": "Value", "operatingMargin": "Value", "netMargin": "Value", "roi": "Value", "roce": "Value"
+                            "grossMargin": "XX%", "operatingMargin": "XX%", "netMargin": "XX%", "roi": "XX%", "roce": "XX%"
                         },
                         "segmentBreakdown": [
-                            {"name": "Division", "revenue": "Value", "profit": "Value", "roic": "Value", "context": "Brief insight"}
+                            {"name": "Division", "revenue": "Value", "profit": "Value", "roic": "Value", "context": "Insight"}
                         ],
                         "riskAssessment": {
                             "riskLevel": "Low/Medium/High",
-                            "keyRisks": [{"type": "category", "finding": "description", "severity": "1-10"}]
+                            "keyRisks": [{"type": "Category", "finding": "Description", "severity": "1-10"}]
                         },
                         "baselineFinancials": {
                             "monthlyRevenue": 0, "monthlyOperatingExpenses": 0, "currentCashReserves": 0, "totalDebt": 0
                         },
                         "strategicRecommendations": [
-                            {"action": "Specific business step", "expectedImpact": "measurable outcome", "priority": "High/Med/Low"}
+                            {"action": "Step", "expectedImpact": "Outcome", "priority": "High/Med/Low"}
                         ],
                         "detailedBreakdown": {
                             "salesGrowth": "Value", "operatingProfitChange": "Value", "netIncomeTrend": "Value"

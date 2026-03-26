@@ -201,37 +201,52 @@ const SegmentComparativePanel = ({ segments }) => (
   </div>
 );
 
-const MonteCarloScenarioStudio = ({ data, runway }) => (
-  <div className="result-card monte-v11">
-     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px'}}>
-        <div>
-           <h3><GitBranch size={16}/> Business Sustainability Forecast</h3>
-           <p style={{fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '4px'}}>
-              Executing <b>1,000 simulations</b> per month | 95% Confidence Interval
-           </p>
-        </div>
-        <div style={{fontSize: '1.6rem', fontWeight: 900, color: runway === 12 ? 'var(--accent-success)' : 'var(--accent-vibrant)', background: 'rgba(255,255,255,0.05)', padding: '10px 20px', borderRadius: '15px'}}>
-           {runway === 12 ? '>12' : runway} <span style={{fontSize: '0.8rem', opacity: 0.6}}>Months Runway</span>
-        </div>
-     </div>
-     <div style={{height: '320px', width: '100%', marginTop: '20px'}}>
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data}>
-            <defs>
-              <linearGradient id="colorCash" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="var(--accent-primary)" stopOpacity={0.4}/><stop offset="95%" stopColor="var(--accent-primary)" stopOpacity={0}/></linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
-            <XAxis dataKey="month" stroke="rgba(255,255,255,0.3)" fontSize={11} tickLine={false} axisLine={false} />
-            <YAxis stroke="rgba(255,255,255,0.3)" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `$${(v/1000).toFixed(0)}k`} />
-            <Tooltip contentStyle={{background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: '16px', fontSize: '12px', backdropFilter: 'blur(20px)'}} />
-            <Area type="monotone" dataKey="bestCase" stroke="transparent" fill="var(--accent-success)" fillOpacity={0.05} />
-            <Area type="monotone" dataKey="worstCase" stroke="transparent" fill="var(--accent-vibrant)" fillOpacity={0.05} />
-            <Area type="monotone" dataKey="cashReserves" stroke="var(--accent-primary)" strokeWidth={4} fillOpacity={1} fill="url(#colorCash)" />
-          </AreaChart>
-        </ResponsiveContainer>
-     </div>
-  </div>
-);
+const MonteCarloScenarioStudio = ({ data, runway, currency }) => {
+  const formatCurrency = (value) => {
+    if (Math.abs(value) >= 1.0e+9) return (value / 1.0e+9).toFixed(1) + "B";
+    if (Math.abs(value) >= 1.0e+6) return (value / 1.0e+6).toFixed(1) + "M";
+    if (Math.abs(value) >= 1.0e+3) return (value / 1.0e+3).toFixed(1) + "k";
+    return value.toFixed(0);
+  };
+
+  return (
+    <div className="result-card monte-v11">
+       <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px'}}>
+          <div>
+             <h3><GitBranch size={16}/> Business Sustainability Forecast</h3>
+             <p style={{fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '4px'}}>
+                Executing <b>1,000 simulations</b> per month | 95% Confidence Interval
+             </p>
+          </div>
+          <div style={{fontSize: '1.6rem', fontWeight: 900, color: runway === 12 ? 'var(--accent-success)' : 'var(--accent-vibrant)', background: 'rgba(255,255,255,0.05)', padding: '10px 20px', borderRadius: '15px'}}>
+             {runway === 12 ? '>12' : runway} <span style={{fontSize: '0.8rem', opacity: 0.6}}>Months Runway</span>
+          </div>
+       </div>
+       <div style={{height: '320px', width: '100%', marginTop: '20px'}}>
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={data}>
+              <defs>
+                <linearGradient id="colorCash" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="var(--accent-primary)" stopOpacity={0.4}/><stop offset="95%" stopColor="var(--accent-primary)" stopOpacity={0}/></linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
+              <XAxis dataKey="month" stroke="rgba(255,255,255,0.3)" fontSize={11} tickLine={false} axisLine={false} />
+              <YAxis stroke="rgba(255,255,255,0.3)" fontSize={11} tickLine={false} axisLine={false} tickFormatter={formatCurrency} />
+              <Tooltip 
+                formatter={(val) => [formatCurrency(val), "Cash"]}
+                contentStyle={{background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: '16px', fontSize: '12px', backdropFilter: 'blur(20px)'}} 
+              />
+              <Area type="monotone" dataKey="bestCase" stroke="transparent" fill="var(--accent-success)" fillOpacity={0.05} />
+              <Area type="monotone" dataKey="worstCase" stroke="transparent" fill="var(--accent-vibrant)" fillOpacity={0.05} />
+              <Area type="monotone" dataKey="cashReserves" stroke="var(--accent-primary)" strokeWidth={4} fillOpacity={1} fill="url(#colorCash)" />
+            </AreaChart>
+          </ResponsiveContainer>
+       </div>
+       <div style={{marginTop: '20px', fontSize: '0.65rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '5px'}}>
+          <Info size={12}/> AI-driven normalization applied to original currency values.
+       </div>
+    </div>
+  );
+};
 
 const ResultsDashboard = ({ results, onReset, chartData, runwayMonths }) => {
   if (results?.analysisSuccessful === false) {
