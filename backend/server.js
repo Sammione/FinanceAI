@@ -55,42 +55,64 @@ app.post('/api/analyze', upload.single('document'), async (req, res) => {
             return res.status(400).json({ error: 'Could not extract text from document.' });
         }
 
-        // --- SMART EXTRACTION LOGIC (v2.1) ---
-        // Large reports (200+ pages) have financials deep in the document.
-        // Instead of taking the first 40k chars, we search for financial anchors.
-        
-        let smartContent = "";
+        // --- ADVANCED SMART EXTRACTION (v3.0) ---
+        // Avoids Table of Contents by searching for deeper occurrences.
         const anchors = [
             "Consolidated Income Statement",
             "Consolidated Statement of Profit or Loss",
             "Consolidated Balance Sheet",
+            "Consolidated Statement of Financial Position",
             "Consolidated Statement of Cash Flows",
-            "Notes to the Financial Statements",
-            "Key Financial Highlights"
+            "Financial Highlights",
+            "Notes to the Financial Statements"
         ];
         
-        const anchorHits = [];
+        let slices = [];
         anchors.forEach(term => {
-            const idx = extractedText.toLowerCase().indexOf(term.toLowerCase());
-            if (idx !== -1) anchorHits.push(idx);
+            let pos = extractedText.toLowerCase().indexOf(term.toLowerCase());
+            while (pos !== -1) {
+                // Ignore occurrences in the first ~5000 chars (likely TOC)
+                if (pos > 5000) {
+                    console.log(`[ANCHOR HIT] Found "${term}" at position ${pos}`);
+                    slices.push({
+                        start: Math.max(0, pos - 2000),
+                        end: Math.min(extractedText.length, pos + 30000)
+                    });
+                }
+                pos = extractedText.toLowerCase().indexOf(term.toLowerCase(), pos + 1);
+                if (slices.length > 5) break; // Don't take too many slices
+            }
         });
 
-        if (anchorHits.length > 0) {
-            // Take slices around the anchors
-            anchorHits.sort((a,b) => a-b);
-            anchorHits.forEach((pos, i) => {
-                if (i > 3) return; // Limit to 4 key sections
-                const start = Math.max(0, pos - 5000);
-                const end = Math.min(extractedText.length, pos + 25000);
-                smartContent += `\n--- [SECTION: ${anchors[i] || 'Financial Data'}] ---\n`;
-                smartContent += extractedText.substring(start, end) + "\n";
-            });
-        } else {
-            // Fallback to first 40k characters if no anchors found
-            smartContent = extractedText.substring(0, 40000);
+        // Merge overlapping slices and construct content
+        slices.sort((a,b) => a.start - b.start);
+        let merged = [];
+        if (slices.length > 0) {
+            let current = slices[0];
+            for (let i = 1; i < slices.length; i++) {
+                if (slices[i].start < current.end) {
+                    current.end = Math.max(current.end, slices[i].end);
+                } else {
+                    merged.push(current);
+                    current = slices[i];
+                }
+            }
+            merged.push(current);
+        }
+
+        let smartContent = "";
+        merged.forEach((m, i) => {
+            smartContent += `\n--- [FINANCIAL SECTION ${i+1}] ---\n`;
+            smartContent += extractedText.substring(m.start, m.end) + "\n";
+        });
+
+        if (!smartContent.trim()) {
+            console.log("[SMART EXTRACT] No deep anchors found. Falling back to start.");
+            smartContent = extractedText.substring(0, 50000);
         }
 
         const truncatedText = smartContent;
+        console.log(`[ANALYSIS] Prepared ${truncatedText.length} characters for AI.`);
 
         const response = await openai.chat.completions.create({
             model: "gpt-4o",
